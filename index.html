@@ -11,16 +11,13 @@
             /* App's gradient background */
             background: linear-gradient(to bottom right, #FC00FF, #00DBDE);
             background-attachment: fixed;
-            
             color: white;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            
             /* Center content */
             display: flex;
             justify-content: center;
             align-items: center;
             text-align: center;
-            
             height: 100vh;
             margin: 0;
             padding: 20px;
@@ -47,38 +44,31 @@
     </style>
     <script>
         function redirect() {
-            // Get the full URL from the browser
             const url = window.location.href;
-            
-            // The authentication details (like the access token) are in the "fragment" part of the URL after the '#'
             const fragment = url.split('#')[1];
 
             if (fragment) {
-                // Construct the custom app scheme URL with the fragment
                 const appUrl = 'com.example.daaymn://login-callback/#' + fragment;
-
-                // Try to open the app
                 window.location.replace(appUrl);
 
-                // If the app doesn't open after a short delay, update the message to guide the user.
+                // This message appears if the app isn't installed.
                 setTimeout(() => {
-                    document.getElementById('message').innerText = 
-                        'Could not automatically open the app. Please make sure it is installed, or download it from your app store.';
+                    document.getElementById('message').innerText =
+                        'Verification successful! Please open the Daaymn app on your phone to continue.';
                 }, 2500);
+
             } else {
-                 document.getElementById('message').innerText = 'Invalid link. Please return to your email and try again.';
+                 // **This is the message we just fixed based on your feedback.**
+                 document.getElementById('message').innerText = 'Invalid link. Please return to the app and request a new one.';
             }
         }
-
-        // Run the redirect function as soon as the page loads
         window.onload = redirect;
     </script>
 </head>
 <body>
     <div class="container">
         <h1>Daaymn</h1>
-        <p id="message">Redirecting to the app...</p>
+        <p id="message">Verifying...</p>
     </div>
 </body>
 </html>
-
