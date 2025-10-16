@@ -4,16 +4,12 @@
     <title>Daaymn</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* Import the Pacifico font from Google Fonts */
         @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
-
         body {
-            /* App's gradient background */
             background: linear-gradient(to bottom right, #FC00FF, #00DBDE);
             background-attachment: fixed;
             color: white;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            /* Center content */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -23,20 +19,15 @@
             padding: 20px;
             box-sizing: border-box;
         }
-
         .container {
             max-width: 400px;
         }
-
-        /* Style the heading with the Pacifico font */
         h1 {
             font-family: 'Pacifico', cursive;
             font-size: 48px;
             margin-bottom: 24px;
-            /* Add a subtle text shadow for better readability */
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
-
         p {
             font-size: 18px;
             line-height: 1.5;
@@ -48,19 +39,21 @@
             const fragment = url.split('#')[1];
 
             if (fragment) {
-                // This handles password resets or logins with session data in the URL.
-                const appUrl = 'com.example.daaymn://login-callback/#' + fragment;
-                window.location.replace(appUrl);
+                // **NEW:** Check if the URL fragment contains an error.
+                if (fragment.includes('error=')) {
+                    document.getElementById('message').innerText = 'Invalid link. Please return to the app and request a new one.';
+                } else {
+                    // This is a valid password reset or other session-based redirect.
+                    const appUrl = 'com.example.daaymn://login-callback/#' + fragment;
+                    window.location.replace(appUrl);
 
-                // Fallback message for users on devices without the app installed.
-                setTimeout(() => {
-                    document.getElementById('message').innerText =
-                        'Action successful! Please open the Daaymn app on your phone to continue.';
-                }, 2500);
-
+                    // Fallback message for users on devices without the app.
+                    setTimeout(() => {
+                        document.getElementById('message').innerText = 'Action successful! Please open the Daaymn app on your phone to continue.';
+                    }, 2500);
+                }
             } else {
-                 // This handles secure email verification.
-                 // The user has been verified but isn't logged in.
+                 // This handles successful secure email verification (no fragment).
                  document.getElementById('message').innerText = 'Thank you for verifying! Please return to the app and log in.';
             }
         }
