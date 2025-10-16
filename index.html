@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daaymn</title>
+    <script>
+        function redirect() {
+            // Get the full URL with query parameters
+            const url = window.location.href;
+
+            // Extract the part of the URL after the '#'
+            const fragment = url.split('#')[1];
+
+            if (fragment) {
+                // Construct the custom app scheme URL
+                const appUrl = 'com.example.daaymn://login-callback/#' + fragment;
+
+                // Try to open the app
+                window.location.replace(appUrl);
+
+                // If the app doesn't open after a short delay, inform the user.
+                setTimeout(() => {
+                    document.getElementById('message').innerText = 
+                        'Could not automatically open the app. Please open it manually or install it from the app store.';
+                }, 2000);
+            } else {
+                 document.getElementById('message').innerText = 'Invalid link. Please try again.';
+            }
+        }
+        // Run the redirect function when the page loads
+        window.onload = redirect;
+    </script>
+</head>
+<body>
+    <h1>Redirecting to Daaymn...</h1>
+    <p id="message">If the app does not open automatically, please make sure it is installed.</p>
+</body>
+</html>
