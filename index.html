@@ -48,18 +48,20 @@
             const fragment = url.split('#')[1];
 
             if (fragment) {
+                // This handles password resets or logins with session data in the URL.
                 const appUrl = 'com.example.daaymn://login-callback/#' + fragment;
                 window.location.replace(appUrl);
 
-                // This message appears if the app isn't installed.
+                // Fallback message for users on devices without the app installed.
                 setTimeout(() => {
                     document.getElementById('message').innerText =
-                        'Verification successful! Please open the Daaymn app on your phone to continue.';
+                        'Action successful! Please open the Daaymn app on your phone to continue.';
                 }, 2500);
 
             } else {
-                 // **This is the message we just fixed based on your feedback.**
-                 document.getElementById('message').innerText = 'Invalid link. Please return to the app and request a new one.';
+                 // This handles secure email verification.
+                 // The user has been verified but isn't logged in.
+                 document.getElementById('message').innerText = 'Thank you for verifying! Please return to the app and log in.';
             }
         }
         window.onload = redirect;
