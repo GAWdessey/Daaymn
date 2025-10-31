@@ -1,79 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <title>Daaymn</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daaymn Home</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
         body {
-            background-color: #121212;
-            color: #FFFFFF;
-            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, #FC00FF, #00DBDE);
+            background-attachment: fixed;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 100vh;
             margin: 0;
-            padding: 0;
-        }
-        .header {
             padding: 20px;
-        }
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
+            box-sizing: border-box;
         }
         .container {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 20px;
-            background-color: #1E1E1E;
-            border-radius: 8px;
+            max-width: 400px;
         }
-        h1, h2 {
-            color: #FFFFFF;
+        h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 48px;
+            margin-bottom: 24px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
-        ul {
-            padding-left: 20px;
-        }
-        li {
-            margin-bottom: 10px;
-        }
-        a {
-            color: #BB86FC;
+        p {
+            font-size: 18px;
+            line-height: 1.5;
         }
     </style>
+    <script>
+        function redirect() {
+            const url = window.location.href;
+            const fragment = url.split('#')[1];
+
+            if (fragment) {
+                // **NEW:** Check if the URL fragment contains an error.
+                if (fragment.includes('error=')) {
+                    document.getElementById('message').innerText = 'Invalid link. Please return to the app and request a new one.';
+                } else {
+                    // This is a valid password reset or other session-based redirect.
+                    const appUrl = 'com.example.daaymn://login-callback/#' + fragment;
+                    window.location.replace(appUrl);
+
+                    // Fallback message for users on devices without the app.
+                    setTimeout(() => {
+                        document.getElementById('message').innerText = 'Action successful! Please open the Daaymn app on your phone to continue.';
+                    }, 2500);
+                }
+            } else {
+                 // This handles successful secure email verification (no fragment).
+                 document.getElementById('message').innerText = 'Thank you for verifying! Please return to the app and log in.';
+            }
+        }
+        window.onload = redirect;
+    </script>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">Daaymn</div>
-    </div>
     <div class="container">
-        <h1>Daaymn Child Safety Policy</h1>
-        <p><strong>Last Updated: July 26, 2024</strong></p>
-
-        <h2>Our Commitment to Child Safety</h2>
-        <p>Daaymn is committed to creating a safe environment for all our users. We have a zero-tolerance policy for child sexual abuse and exploitation (CSAE). This policy outlines our standards and practices to prevent, detect, and respond to CSAE on our platform.</p>
-
-        <h2>Prohibited Content</h2>
-        <p>Any content that depicts, promotes, or facilitates child sexual abuse is strictly prohibited. This includes, but is not limited to:</p>
-        <ul>
-            <li>Images, videos, or audio of child sexual abuse (CSAM).</li>
-            <li>Content that sexually exploits or endangers children.</li>
-            <li>Grooming or soliciting minors for sexual purposes.</li>
-            <li>Content that promotes or enables child trafficking.</li>
-        </ul>
-
-        <h2>Reporting Child Safety Concerns</h2>
-        <p>We provide an in-app reporting feature that allows users to report any content or behavior that violates our child safety policy. We encourage all users to report any suspected instances of CSAE immediately.</p>
-
-        <h2>Moderation and Enforcement</h2>
-        <p>Our dedicated safety team reviews all user reports and proactively monitors the platform for CSAE. We use a combination of automated detection technologies and human review to identify and remove prohibited content.</p>
-        <p>Any user found to be in violation of this policy will have their account immediately terminated, and we will take appropriate action, which may include reporting the user to law enforcement.</p>
-
-        <h2>Cooperation with Law Enforcement</h2>
-        <p>Daaymn cooperates fully with law enforcement agencies in the investigation and prosecution of CSAE. We will report all instances of CSAM to the National Center for Missing and Exploited Children (NCMEC) and other relevant authorities as required by law.</p>
-
-        <h2>Contact Information</h2>
-        <p>For any questions or concerns regarding our child safety practices, please contact our designated point of contact:</p>
-        <p><strong>Email:</strong> daaymno@gmail.com</p>
-        <p>We are committed to continuously improving our safety measures to protect our users and maintain a safe and positive community.</p>
+        <h1>Daaymn</h1>
+        <p id="message">Verifying...</p>
     </div>
 </body>
 </html>
