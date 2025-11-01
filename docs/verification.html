@@ -12,32 +12,28 @@ h1 { font-family:'Pacifico',cursive; font-size:48px; margin-bottom:24px; }
 </style>
 <script>
 function handleRedirect() {
-    // The 'hash' property contains the part of the URL from '#' onwards
     const fragment = window.location.hash;
 
     // SCENARIO 1: PASSWORD RESET
-    // If a fragment exists (e.g., #access_token=...), it's a password reset link.
+    // Supabase adds a #fragment for password resets.
     if (fragment) {
-        // Check for an error from Supabase in the fragment
         if (fragment.includes('error=')) {
             document.getElementById('message').innerText = 'Invalid or expired link. Please return to the app and request a new one.';
         } else {
-            // If it's a valid fragment, construct the deep link for the reset screen
+            // Forward the entire fragment to the app. The app will handle the token.
             const appUrl = 'com.daaymn.app://reset-password' + fragment;
             document.getElementById('message').innerText = 'Redirecting you to the app to reset your password...';
             window.location.replace(appUrl);
         }
     } 
     // SCENARIO 2: EMAIL VERIFICATION
-    // If no fragment exists, it's a simple email verification link.
+    // This link has no fragment.
     else {
         document.getElementById('message').innerText = 'Thank you for verifying! Redirecting you to the app...';
         const appUrl = 'com.daaymn.app://login-verified';
         window.location.replace(appUrl);
     }
 }
-
-// Run the function as soon as the page loads
 window.onload = handleRedirect;
 </script>
 </head>
