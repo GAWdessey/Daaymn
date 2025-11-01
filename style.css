@@ -1,0 +1,182 @@
+body {
+    background-color: #121212;
+    color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+h1 {
+    font-family: 'Pacifico', cursive;
+    color: #FC00FF;
+    font-size: 4rem;
+    margin-bottom: 0.5rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+p {
+    color: #b3b3b3;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+#prereg-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#email-input {
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background-color: #242424;
+    color: #FFFFFF;
+    font-size: 1rem;
+    text-align: center;
+}
+
+#email-input:focus {
+    outline: none;
+    border-color: #FC00FF;
+}
+
+button {
+    padding: 1rem;
+    border-radius: 8px;
+    border: none;
+    background-color: #FC00FF;
+    color: #FFFFFF;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #d800db;
+}
+
+#response-message {
+    margin-top: 1rem;
+    font-size: 1rem;
+    height: 20px;
+}
+
+/* --- FINAL LAYOUT & VIBE --- */
+.container {
+    max-width: 500px;
+    padding: 2rem;
+    position: relative;
+    z-index: 10;
+    background-color: rgba(18, 18, 18, 0.75);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+.background-screenshots {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.bg-ss {
+    position: absolute;
+    width: 220px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease;
+    opacity: 0.1;
+}
+
+.bg-ss img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: inherit;
+}
+
+.bg-ss:hover {
+    opacity: 1.0;
+    z-index: 3; 
+    transform: scale(1.1) rotate(0deg) !important;
+    animation: none; /* Stop pulsating when hovered */
+}
+
+/* --- NEW: Pulsating Animation --- */
+@keyframes pulsate {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1.0) rotate(8deg);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05) rotate(8deg);
+  }
+}
+
+/* --- FINAL 2x2 POSITIONS --- */
+/* Left Top Row */
+.ss1 { top: 10%; left: 5%; transform: rotate(-10deg); }
+.ss7 { top: 20%; left: 25%; transform: rotate(5deg); }
+
+/* Left Bottom Row */
+.ss2 { 
+    bottom: 25%; 
+    left: 5%; 
+    transform: rotate(12deg);
+    animation: pulsate 2.5s infinite ease-in-out; /* Apply the pulsation */
+}
+.ss3 { bottom: 10%; left: 25%; transform: rotate(-8deg); }
+
+/* Right Top Row */
+.ss4 { top: 15%; right: 25%; transform: rotate(8deg); }
+.ss8 { top: 5%; right: 5%; transform: rotate(-5deg); }
+
+/* Right Bottom Row */
+.ss5 { bottom: 10%; right: 25%; transform: rotate(10deg); }
+.ss6 { bottom: 25%; right: 5%; transform: rotate(-12deg); }
+
+
+/* --- CENTRAL CAPTION DISPLAY --- */
+#hover-caption-display {
+    position: absolute;
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    width: 80%;
+    max-width: 700px;
+    z-index: 20;
+    padding: 1rem;
+    font-family: 'Pacifico', cursive;
+    font-size: 2.2rem;
+    color: #FC00FF;
+    text-shadow: 0px 4px 10px rgba(0, 0, 0, 1), 0 0 25px rgba(252, 0, 255, 0.7);
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+@media (max-width: 1024px) {
+    .background-screenshots { display: none; }
+    #hover-caption-display { display: none; }
+}
