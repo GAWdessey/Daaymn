@@ -1,69 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Daaymn</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
-        body {
-            background: linear-gradient(to bottom right, #FC00FF, #00DBDE);
-            background-attachment: fixed;
-            color: white;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .container {
-            max-width: 400px;
-        }
-        h1 {
-            font-family: 'Pacifico', cursive;
-            font-size: 48px;
-            margin-bottom: 24px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        p {
-            font-size: 18px;
-            line-height: 1.5;
-        }
-    </style>
-    <script>
-        function redirect() {
-            const url = window.location.href;
-            const fragment = url.split('#')[1];
+  <title>Daaymn</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../style.css">
+  <script>
+    function redirect() {
+      const url = window.location.href;
+      const fragment = url.split('#')[1];
+      const message = document.getElementById('message');
 
-            if (fragment) {
-                // **NEW:** Check if the URL fragment contains an error.
-                if (fragment.includes('error=')) {
-                    document.getElementById('message').innerText = 'Invalid link. Please return to the app and request a new one.';
-                } else {
-                    // This is a valid password reset or other session-based redirect.
-                    const appUrl = 'com.example.daaymn://login-callback/#' + fragment;
-                    window.location.replace(appUrl);
-
-                    // Fallback message for users on devices without the app.
-                    setTimeout(() => {
-                        document.getElementById('message').innerText = 'Action successful! Please open the Daaymn app on your phone to continue.';
-                    }, 2500);
-                }
-            } else {
-                 // This handles successful secure email verification (no fragment).
-                 document.getElementById('message').innerText = 'Thank you for verifying! Please return to the app and log in.';
-            }
+      if(fragment){
+        if(fragment.includes('error=')){
+          message.innerText = 'Invalid link. Please return to the app and request a new one.';
+        } else {
+          const appUrl = 'com.example.daaymn://login-callback/#'+fragment;
+          window.location.replace(appUrl);
+          setTimeout(()=>{ message.innerText='Action successful! Open Daaymn on your phone.'; }, 2500);
         }
-        window.onload = redirect;
-    </script>
+      } else {
+        message.innerText = 'Thank you for verifying! Please return to the app and log in.';
+      }
+    }
+    window.onload = redirect;
+  </script>
 </head>
 <body>
-    <div class="container">
+  <div class="container">
+    <header>
+      <h1>Daaymn!</h1>
+      <ul class="nav-tabs">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="verification.html" class="active">Verify</a></li>
+        <li><a href="child_safety_policy.html">Child Safety</a></li>
+        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+        <li><a href="account_deletion.html">Delete Account</a></li>
+      </ul>
+    </header>
+
+    <main class="scrollable">
+      <div class="card">
         <h1>Daaymn</h1>
         <p id="message">Verifying...</p>
-    </div>
+      </div>
+    </main>
+  </div>
 </body>
 </html>
