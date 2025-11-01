@@ -1,65 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>How to Delete Your Daaymn Account</title>
-  <link rel="stylesheet" href="../style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Delete Your Daaymn Account</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin:0;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(180deg,#071026 0%, #071826 100%);
+    color:#e6eef6;
+  }
+  .container {
+    max-width: 760px;
+    margin: 2rem auto;
+    padding: 28px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius: 12px;
+    box-shadow: 0 6px 30px rgba(2,6,23,.6);
+    overflow-y: auto;
+    max-height: 80vh;
+  }
+  h1 {
+    font-family: 'Pacifico', cursive;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  p { line-height: 1.6; margin-bottom: 1rem; }
+  ol { margin-left: 1.2rem; margin-bottom: 1rem; color:#dfe9f5; }
+  li { margin: 0.5rem 0; }
+  .note { background: rgba(255,82,82,0.06); border-left:4px solid #ff5252; padding:12px; border-radius:6px; margin-bottom:1rem;}
+  .actions { display:flex; gap:12px; margin-top:1rem;}
+  button { padding:10px 14px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); cursor:pointer; background:transparent; color:inherit; }
+  .danger { border-color:#ff5252; color:#ff5252; }
+</style>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>Daaymn!</h1>
-      <ul class="nav-tabs">
-        <li><a href="../index.html">Home</a></li>
-        <li><a href="verification.html">Verify</a></li>
-        <li><a href="child_safety_policy.html">Child Safety</a></li>
-        <li><a href="privacy-policy.html">Privacy Policy</a></li>
-        <li><a href="account_deletion.html" class="active">Delete Account</a></li>
-      </ul>
-    </header>
-
-    <main class="scrollable">
-      <article class="card" role="main" aria-labelledby="page-title">
-        <h1 id="page-title">How to Delete Your Daaymn Account</h1>
-        <p>To permanently delete your account and all associated data, please follow these steps:</p>
-        <ol>
-          <li>Open the Daaymn app on your device.</li>
-          <li>Navigate to the main "Profile" tab.</li>
-          <li>Tap the Settings icon (it looks like a gear ⚙️) in the top right corner.</li>
-          <li>In the Settings menu, scroll to the "Account" section.</li>
-          <li>Tap on "Delete Account".</li>
-          <li>Confirm your decision in the pop-up dialog.</li>
-        </ol>
-
-        <div class="note" role="note">
-          <strong>Please note:</strong> This action is irreversible and will permanently delete your profile, matches, messages, and all other data associated with your account.
-        </div>
-
-        <div class="actions">
-          <button class="muted" onclick="copyText()">Copy text</button>
-          <button class="danger" onclick="confirmDelete()">Simulate delete (demo)</button>
-        </div>
-
-        <footer>
-          This page is a static instructional page. Hook to your backend API for real account deletion.
-        </footer>
-      </article>
-    </main>
+    <h1>How to Delete Your Daaymn Account</h1>
+    <p>To permanently delete your account and all associated data, please follow these steps:</p>
+    <ol>
+      <li>Open the Daaymn app on your device.</li>
+      <li>Navigate to the main "Profile" tab.</li>
+      <li>Tap the Settings icon (gear ⚙️) in top right corner.</li>
+      <li>Scroll to "Account".</li>
+      <li>Tap "Delete Account".</li>
+      <li>Confirm in the pop-up.</li>
+    </ol>
+    <div class="note"><strong>Note:</strong> This is irreversible. All data will be deleted.</div>
+    <div class="actions">
+      <button onclick="copyText()">Copy Text</button>
+      <button class="danger" onclick="confirmDelete()">Simulate Delete (Demo)</button>
+    </div>
   </div>
 
-  <script>
-    const exactText = `How to Delete Your Daaymn Account\n\nTo permanently delete your account and all associated data, please follow these steps:\n\n1.Open the Daaymn app on your device.\n2.Navigate to the main "Profile" tab.\n3.Tap the Settings icon (it looks like a gear ⚙️) in the top right corner.\n4.In the Settings menu, scroll to the "Account" section.\n5.Tap on "Delete Account".\n6.Confirm your decision in the pop-up dialog.\n\nPlease note: This action is irreversible and will permanently delete your profile, matches, messages, and all other data associated with your account.`;
-
-    function copyText(){
-      navigator.clipboard?.writeText(exactText).then(()=>alert('Text copied to clipboard.')).catch(()=>prompt('Copy the text below:', exactText));
-    }
-
-    function confirmDelete(){
-      if(confirm('Are you absolutely sure you want to permanently delete your account and all data? This cannot be undone.')){
-        alert('Demo: deletion confirmed. Implement server-side flow to actually delete accounts.');
-      }
-    }
-  </script>
+<script>
+const exactText=`How to Delete Your Daaymn Account\n\nFollow these steps:\n1.Open app\n2.Profile tab\n3.Settings\n4.Account\n5.Delete Account\n6.Confirm\n\nNote: irreversible.`;
+function copyText(){navigator.clipboard.writeText(exactText).then(()=>alert('Copied!')).catch(()=>prompt('Copy:',exactText));}
+function confirmDelete(){if(confirm('Are you sure? This cannot be undone.')) alert('Demo: deletion confirmed');}
+</script>
 </body>
 </html>
