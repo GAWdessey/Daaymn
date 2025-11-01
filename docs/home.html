@@ -182,4 +182,29 @@
       const email = document.getElementById('email-input').value.trim();
       if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
         responseMessage.textContent = "Enter a valid email!";
-        responseMes
+        responseMessage.style.color = '#ff4d4d';
+        return;
+      }
+
+      try{
+        const {data, error} = await supabase.from('preregistrations').insert([{email}]);
+        if(error) throw error;
+        responseMessage.textContent = "You're on the list! We'll be in touch.";
+        responseMessage.style.color = '#FC00FF';
+        document.getElementById('email-input').value='';
+      } catch(err){
+        responseMessage.textContent = 'Something went wrong.';
+        responseMessage.style.color = '#ff4d4d';
+      }
+    });
+
+    // ---------------- Screenshot Hover ----------------
+    const screenshots = document.querySelectorAll('.bg-ss');
+    const captionDisplay = document.getElementById('hover-caption-display');
+    screenshots.forEach(ss=>{
+      ss.addEventListener('mouseenter', ()=>{ captionDisplay.textContent = ss.dataset.caption; captionDisplay.style.opacity='1'; captionDisplay.style.transform='translateX(-50%) translateY(0)'; });
+      ss.addEventListener('mouseleave', ()=>{ captionDisplay.style.opacity='0'; captionDisplay.style.transform='translateX(-50%) translateY(20px)'; });
+    });
+  </script>
+</body>
+</html>
