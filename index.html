@@ -1,75 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daaymn - The Wait is Almost Over</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daaymn - Home</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+<div class="container">
+  <header>
+    <h1>Daaymn!</h1>
+    <ul class="nav-tabs">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="docs/home.html">App Home</a></li>
+      <li><a href="docs/verification.html">Verify</a></li>
+      <li><a href="docs/child_safety_policy.html">Child Safety</a></li>
+      <li><a href="docs/privacy-policy.html">Privacy Policy</a></li>
+      <li><a href="docs/account_deletion.html">Delete Account</a></li>
+    </ul>
+  </header>
 
-  <!-- START: Floating Background Screenshots -->
-  <div class="background-screenshots">
-    <div class="bg-ss ss1" data-caption="Your stats don't have feelings. We deliver them cold.">
-      <img src="screenshot-reports.png" alt="Daaymn Report Card Screen">
-    </div>
-    <div class="bg-ss ss2" data-caption="If they're on here, they're worth a 'Daaymn'.">
-      <img src="screenshot-discover.png" alt="Daaymn Discover Screen">
-    </div>
-    <div class="bg-ss ss3" data-caption="Don't get benched. Check your stats.">
-      <img src="screenshot-warning.png" alt="Daaymn Warning Screen">
-    </div>
-    <div class="bg-ss ss7" data-caption="The last dating app you'll ever log into.">
-      <img src="screenshot-login.png" alt="Daaymn Login Screen">
-    </div>
-    <div class="bg-ss ss4" data-caption="Make it yours. Then make your move.">
-      <img src="screenshot-themes.png" alt="Daaymn Themes Screen">
-    </div>
-    <div class="bg-ss ss5" data-caption="The data doesn't lie. Do you?">
-      <img src="screenshot-stats.png" alt="Daaymn Deluxe Stats Screen">
-    </div>
-    <div class="bg-ss ss6" data-caption="Confidence is attractive. Send a message first.">
-      <img src="screenshot-otm.png" alt="Daaymn OTM Screen">
-    </div>
-    <div class="bg-ss ss8" data-caption="Power up your profile. Get more likes.">
-      <img src="screenshot-likes.png" alt="Daaymn Likes Store">
-    </div>
-  </div>
-  <!-- END: Floating Background Screenshots -->
+  <main>
+    <h2>The dating app that's actually worth your time is coming.</h2>
+    <p>Be the first to know when we launch!</p>
+    <form id="prereg-form">
+      <input type="email" id="email-input" placeholder="Enter your email" required>
+      <button type="submit">Notify Me</button>
+    </form>
+    <div id="response-message"></div>
+  </main>
+</div>
 
-  <div class="container">
-    <header>
-      <h1>Daaymn!</h1>
-      <nav>
-        <ul class="nav-tabs">
-          <li><a href="index.html" class="active">Home</a></li>
-          <li><a href="docs/home.html">App Home</a></li>
-          <li><a href="docs/verification.html">Verification</a></li>
-          <li><a href="docs/child_safety_policy.html">Child Safety</a></li>
-          <li><a href="docs/privacy-policy.html">Privacy Policy</a></li>
-          <li><a href="docs/account_deletion.html">Account Deletion</a></li>
-        </ul>
-      </nav>
-    </header>
+<script>
+const supabaseUrl = 'https://rrbsjmfwahaerkfhpegv.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    <main>
-      <h2>The dating app that's actually worth your time is coming.</h2>
-      <p>Tired of endless swiping? Ready to say 'Daaymn!' to someone new? Be the first to know when we launch.</p>
-      <form id="prereg-form">
-        <input type="email" id="email-input" placeholder="Enter your email address" required>
-        <button type="submit">Notify Me</button>
-      </form>
-      <div id="response-message"></div>
-    </main>
-  </div>
-
-  <div id="hover-caption-display"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js"></script>
+document.getElementById('prereg-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const email = document.getElementById('email-input').value.trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+        document.getElementById('response-message').textContent = "Enter a valid email!";
+        return;
+    }
+    try {
+        const { error } = await supabase.from('preregistrations').insert([{email}]);
+        if(error) throw error;
+        document.getElementById('response-message').textContent = "You're on the list!";
+        document.getElementById('email-input').value = '';
+    } catch(err){
+        document.getElementById('response-message').textContent = "Something went wrong.";
+    }
+});
+</script>
 </body>
 </html>
-
