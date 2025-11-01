@@ -1,69 +1,185 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Daaymn</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
-        body {
-            background: linear-gradient(to bottom right, #FC00FF, #00DBDE);
-            background-attachment: fixed;
-            color: white;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .container {
-            max-width: 400px;
-        }
-        h1 {
-            font-family: 'Pacifico', cursive;
-            font-size: 48px;
-            margin-bottom: 24px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        p {
-            font-size: 18px;
-            line-height: 1.5;
-        }
-    </style>
-    <script>
-        function redirect() {
-            const url = window.location.href;
-            const fragment = url.split('#')[1];
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daaymn - The Wait is Almost Over</title>
 
-            if (fragment) {
-                // **NEW:** Check if the URL fragment contains an error.
-                if (fragment.includes('error=')) {
-                    document.getElementById('message').innerText = 'Invalid link. Please return to the app and request a new one.';
-                } else {
-                    // This is a valid password reset or other session-based redirect.
-                    const appUrl = 'com.example.daaymn://login-callback/#' + fragment;
-                    window.location.replace(appUrl);
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 
-                    // Fallback message for users on devices without the app.
-                    setTimeout(() => {
-                        document.getElementById('message').innerText = 'Action successful! Please open the Daaymn app on your phone to continue.';
-                    }, 2500);
-                }
-            } else {
-                 // This handles successful secure email verification (no fragment).
-                 document.getElementById('message').innerText = 'Thank you for verifying! Please return to the app and log in.';
-            }
-        }
-        window.onload = redirect;
-    </script>
+<style>
+  /* ---------------- Body & Layout ---------------- */
+  body {
+    background-color: #121212;
+    color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+    text-align: center;
+  }
+
+  header h1 {
+    font-family: 'Pacifico', cursive !important; /* Ensure Pacifico font */
+    color: #FC00FF;
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+
+  .container {
+    max-width: 500px;
+    margin: 3rem auto 0 auto; /* Push container down from top */
+    padding: 2rem;
+    background-color: rgba(18,18,18,0.75);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+    position: relative;
+    z-index: 10;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: #b3b3b3;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem; /* space below tabs */
+  }
+
+  .tabs a {
+    color: #fff;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 700;
+    transition: background 0.3s;
+  }
+
+  .tabs a:hover { background-color: rgba(252,0,255,0.2); }
+
+  /* Prereg Form */
+  #prereg-form { display: flex; flex-direction: column; gap: 1rem; }
+  #email-input {
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background-color: #242424;
+    color: #fff;
+    text-align: center;
+    font-size: 1rem;
+  }
+  #email-input:focus { outline: none; border-color: #FC00FF; }
+
+  button {
+    padding: 1rem;
+    border-radius: 8px;
+    border: none;
+    background-color: #FC00FF;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  button:hover { background-color: #d800db; }
+
+  #response-message { margin-top: 1rem; font-size: 1rem; height: 20px; }
+
+  /* ---------------- Floating Screenshots ---------------- */
+  .background-screenshots { position: absolute; top:0; left:0; width:100%; height:100%; z-index:1; overflow:hidden; }
+  .bg-ss { position: absolute; width:220px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.7); transition: transform 0.4s, opacity 0.3s ease; opacity:0.1; }
+  .bg-ss img { width: 100%; border-radius: inherit; display: block; }
+  .bg-ss:hover { opacity:1; z-index:3; transform: scale(1.1) rotate(0deg); }
+
+  /* Caption */
+  #hover-caption-display {
+    position:absolute;
+    bottom:5%;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    width:80%;
+    max-width:700px;
+    padding:1rem;
+    font-family:'Pacifico', cursive;
+    font-size:2.2rem;
+    color:#FC00FF;
+    text-align:center;
+    pointer-events:none;
+    opacity:0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+</style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Daaymn</h1>
-        <p id="message">Verifying...</p>
+
+  <!-- Floating Background Screenshots -->
+  <div class="background-screenshots">
+    <div class="bg-ss ss1" data-caption="Your stats don't have feelings. We deliver them cold."><img src="screenshot-reports.png" alt="Daaymn Report Card"></div>
+    <div class="bg-ss ss2" data-caption="If they're on here, they're worth a 'Daaymn'."><img src="screenshot-discover.png" alt="Daaymn Discover"></div>
+    <div class="bg-ss ss3" data-caption="Don't get benched. Check your stats."><img src="screenshot-warning.png" alt="Daaymn Warning"></div>
+    <div class="bg-ss ss4" data-caption="Make it yours. Then make your move."><img src="screenshot-themes.png" alt="Daaymn Themes"></div>
+    <div class="bg-ss ss5" data-caption="The data doesn't lie. Do you?"><img src="screenshot-stats.png" alt="Daaymn Deluxe Stats"></div>
+    <div class="bg-ss ss6" data-caption="Confidence is attractive. Send a message first."><img src="screenshot-otm.png" alt="Daaymn OTM"></div>
+    <div class="bg-ss ss7" data-caption="The last dating app you'll ever log into."><img src="screenshot-login.png" alt="Daaymn Login"></div>
+    <div class="bg-ss ss8" data-caption="Power up your profile. Get more likes."><img src="screenshot-likes.png" alt="Daaymn Likes"></div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
+    <header><h1>Daaymn!</h1></header>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <a href="home.html">Home</a>
+      <a href="account_deletion.html">Account Deletion</a>
+      <a href="child_safety_policy.html">Child Safety</a>
+      <a href="privacy-policy.html">Privacy Policy</a>
     </div>
-</body>
-</html>
+
+    <h2>The dating app that's actually worth your time is coming.</h2>
+    <p>Tired of endless swiping? Ready to say 'Daaymn!' to someone new? Be the first to know when we launch.</p>
+
+    <form id="prereg-form">
+      <input type="email" id="email-input" placeholder="Enter your email address" required>
+      <button type="submit">Notify Me</button>
+    </form>
+    <div id="response-message"></div>
+  </div>
+
+  <!-- Caption Display -->
+  <div id="hover-caption-display"></div>
+
+  <!-- ---------------- Scripts ---------------- -->
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Custom JS -->
+  <script>
+    // ---------------- Prereg Form ----------------
+    const supabaseUrl = 'YOUR_SUPABASE_URL';
+    const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    const preregForm = document.getElementById('prereg-form');
+    const responseMessage = document.getElementById('response-message');
+
+    preregForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email-input').value.trim();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+        responseMessage.textContent = "Enter a valid email!";
+        responseMes
