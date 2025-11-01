@@ -2,16 +2,12 @@
 <html>
 <head>
     <title>Verifying Email...</title>
-    <style>
-        body { font-family: sans-serif; background: #f0f0f0; text-align: center; padding-top: 50px; }
-    </style>
     <script>
         window.onload = function() {
-            window.location.replace("com.daaymn.app://login-verified");
+            // Redirects to com.daaymn.app://auth-callback?event=verified
+            window.location.replace("com.daaymn.app://auth-callback?event=verified");
         };
     </script>
 </head>
-<body>
-    <p>Thank you for verifying! Redirecting you to the Daaymn app...</p>
-</body>
+<body><p>Please wait...</p></body>
 </html>
