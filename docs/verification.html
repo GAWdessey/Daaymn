@@ -8,27 +8,43 @@
 <style>
 body { margin:0; font-family:'Inter',sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; background: linear-gradient(to bottom right,#FC00FF,#00DBDE); color:#fff; text-align:center;}
 h1 { font-family:'Pacifico',cursive; font-size:48px; margin-bottom:24px; }
-.container { max-width:400px; }
+.container { max-width:400px; padding: 20px; }
 </style>
 <script>
-function redirect(){
-  const url=window.location.href.split('#')[1];
-  if(url){
-    if(url.includes('error=')) document.getElementById('message').innerText='Invalid link. Return to app and request new one.';
-    else { 
-      const appUrl='com.example.daaymn://login-callback/#'+url;
-      window.location.replace(appUrl);
-      setTimeout(()=>{ document.getElementById('message').innerText='Action done! Open Daaymn app to continue.'; }, 2500);
+function handleRedirect() {
+    // The 'hash' property contains the part of the URL from '#' onwards
+    const fragment = window.location.hash;
+
+    // SCENARIO 1: PASSWORD RESET
+    // If a fragment exists (e.g., #access_token=...), it's a password reset link.
+    if (fragment) {
+        // Check for an error from Supabase in the fragment
+        if (fragment.includes('error=')) {
+            document.getElementById('message').innerText = 'Invalid or expired link. Please return to the app and request a new one.';
+        } else {
+            // If it's a valid fragment, construct the deep link for the reset screen
+            const appUrl = 'com.daaymn.app://reset-password' + fragment;
+            document.getElementById('message').innerText = 'Redirecting you to the app to reset your password...';
+            window.location.replace(appUrl);
+        }
+    } 
+    // SCENARIO 2: EMAIL VERIFICATION
+    // If no fragment exists, it's a simple email verification link.
+    else {
+        document.getElementById('message').innerText = 'Thank you for verifying! Redirecting you to the app...';
+        const appUrl = 'com.daaymn.app://login-verified';
+        window.location.replace(appUrl);
     }
-  } else { document.getElementById('message').innerText='Thank you for verifying! Return to app to log in.'; }
 }
-window.onload=redirect;
+
+// Run the function as soon as the page loads
+window.onload = handleRedirect;
 </script>
 </head>
 <body>
 <div class="container">
 <h1>Daaymn</h1>
-<p id="message">Verifying...</p>
+<p id="message">Please wait, processing your request...</p>
 </div>
 </body>
 </html>
