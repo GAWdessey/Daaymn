@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;700;900&display=swap');
+
 /* Global Styles */
 body {
     background-color: #121212;
@@ -131,3 +133,4 @@ button:hover {
     .container { padding: 1.5rem; }
     .nav-tabs { flex-direction: column; gap: 0.5rem; }
 }
+
