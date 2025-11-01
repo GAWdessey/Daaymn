@@ -2,7 +2,7 @@
       "relation": ["delegate_permission/common.handle_all_urls"],
       "target": {
         "namespace": "android_app",
-        "package_name": "com.example.daaymn",
+        "package_name": "com.daaymn.daaymn",
         "sha256_cert_fingerprints":
         ["D5:72:34:3A:13:40:28:21:AE:EC:0F:87:F9:A2:82:BD:3F:1E:03:BC:09:73:26:45:E8:F3:47:CC:71:DF:24:8B"]
       }
