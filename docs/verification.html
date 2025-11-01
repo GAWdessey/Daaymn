@@ -1,49 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Daaymn</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../style.css">
-  <script>
-    function redirect() {
-      const url = window.location.href;
-      const fragment = url.split('#')[1];
-      const message = document.getElementById('message');
-
-      if(fragment){
-        if(fragment.includes('error=')){
-          message.innerText = 'Invalid link. Please return to the app and request a new one.';
-        } else {
-          const appUrl = 'com.example.daaymn://login-callback/#'+fragment;
-          window.location.replace(appUrl);
-          setTimeout(()=>{ message.innerText='Action successful! Open Daaymn on your phone.'; }, 2500);
-        }
-      } else {
-        message.innerText = 'Thank you for verifying! Please return to the app and log in.';
-      }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daaymn Verification</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+body { margin:0; font-family:'Inter',sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; background: linear-gradient(to bottom right,#FC00FF,#00DBDE); color:#fff; text-align:center;}
+h1 { font-family:'Pacifico',cursive; font-size:48px; margin-bottom:24px; }
+.container { max-width:400px; }
+</style>
+<script>
+function redirect(){
+  const url=window.location.href.split('#')[1];
+  if(url){
+    if(url.includes('error=')) document.getElementById('message').innerText='Invalid link. Return to app and request new one.';
+    else { 
+      const appUrl='com.example.daaymn://login-callback/#'+url;
+      window.location.replace(appUrl);
+      setTimeout(()=>{ document.getElementById('message').innerText='Action done! Open Daaymn app to continue.'; }, 2500);
     }
-    window.onload = redirect;
-  </script>
+  } else { document.getElementById('message').innerText='Thank you for verifying! Return to app to log in.'; }
+}
+window.onload=redirect;
+</script>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Daaymn!</h1>
-      <ul class="nav-tabs">
-        <li><a href="../index.html">Home</a></li>
-        <li><a href="verification.html" class="active">Verify</a></li>
-        <li><a href="child_safety_policy.html">Child Safety</a></li>
-        <li><a href="privacy-policy.html">Privacy Policy</a></li>
-        <li><a href="account_deletion.html">Delete Account</a></li>
-      </ul>
-    </header>
-
-    <main class="scrollable">
-      <div class="card">
-        <h1>Daaymn</h1>
-        <p id="message">Verifying...</p>
-      </div>
-    </main>
-  </div>
+<div class="container">
+<h1>Daaymn</h1>
+<p id="message">Verifying...</p>
+</div>
 </body>
 </html>
