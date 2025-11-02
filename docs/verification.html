@@ -1,73 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daaymn Verification</title>
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: linear-gradient(to bottom right, #FC00FF, #00DBDE);
-  color: #fff;
-  text-align: center;
-}
-h1 {
-  font-family: 'Pacifico', cursive;
-  font-size: 48px;
-  margin-bottom: 24px;
-}
-.container {
-  max-width: 400px;
-  padding: 20px;
-}
+body { margin:0; font-family:'Inter',sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; background: linear-gradient(to bottom right,#FC00FF,#00DBDE); color:#fff; text-align:center;}
+h1 { font-family:'Pacifico',cursive; font-size:48px; margin-bottom:24px; }
+.container { max-width:400px; padding: 20px; }
 </style>
 <script>
-function handleRedirect() {
-  const fragment = window.location.hash;
-  const messageEl = document.getElementById('message');
+window.onload = function() {
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get('type');
+    const token = params.get('access_token');
 
-  // ✅ SCENARIO 1: PASSWORD RESET (Supabase adds #type=recovery...)
-  if (fragment && fragment.includes('type=recovery')) {
-    messageEl.innerText = 'Opening Daaymn so you can reset your password...';
-    // Convert #fragment → ?query for Android deep link
-    const appUrl = 'com.daaymn.app://reset-password?' + fragment.substring(1);
-    window.location.replace(appUrl);
-    return;
-  }
-
-  // ✅ SCENARIO 2: EMAIL VERIFICATION / SIGNUP CONFIRMATION
-  if (fragment && (fragment.includes('type=signup') || fragment.includes('type=invite'))) {
-    messageEl.innerText = 'Daaymn! You’re verified — opening the app...';
-    const appUrl = 'com.daaymn.app://auth-callback?' + fragment.substring(1);
-    window.location.replace(appUrl);
-    return;
-  }
-
-  // ✅ SCENARIO 3: INVALID OR EXPIRED LINK
-  if (fragment && fragment.includes('error=')) {
-    messageEl.innerText = 'This link is invalid or expired. Please open Daaymn and request a new link.';
-    return;
-  }
-
-  // ✅ SCENARIO 4: NO FRAGMENT — GENERIC FALLBACK
-  messageEl.innerText = 'Redirecting you to Daaymn...';
-  const appUrl = 'com.daaymn.app://login';
-  window.location.replace(appUrl);
-}
-
-window.onload = handleRedirect;
+    if (type === 'recovery' && token) {
+        const appUrl = `com.daaymn.app://reset-password?type=recovery&access_token=${token}`;
+        document.getElementById('message').innerText = 'Opening Daaymn to reset your password...';
+        window.location.replace(appUrl);
+    } else if (type === 'signup') {
+        const appUrl = `com.daaymn.app://auth-callback`;
+        document.getElementById('message').innerText = 'Opening Daaymn to confirm your email...';
+        window.location.replace(appUrl);
+    } else {
+        document.getElementById('message').innerText = 'Invalid or expired link. Please return to the app and request a new one.';
+    }
+};
 </script>
 </head>
 <body>
 <div class="container">
-  <h1>Daaymn</h1>
-  <p id="message">Please wait, processing your request...</p>
+<h1>Daaymn</h1>
+<p id="message">Please wait, processing your request...</p>
 </div>
 </body>
 </html>
