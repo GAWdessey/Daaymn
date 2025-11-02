@@ -12,29 +12,29 @@ h1 { font-family:'Pacifico',cursive; font-size:48px; margin-bottom:24px; }
 </style>
 <script>
 window.onload = function() {
-    // Supabase sends all tokens in the URL fragment (the part after '#').
-    if (window.location.hash) {
-        // The fragment includes the '#', so we remove it for parsing.
-        const fragment = window.location.hash.substring(1);
-        const params = new URLSearchParams(fragment);
-        const type = params.get('type');
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get('type');
+    const token = params.get('access_token');
 
-        let appHost = 'auth-callback'; // Default host for email confirmation/magic links
-        let message = 'Opening Daaymn to confirm your email...';
 
-        // Check if this is a password recovery link
-        if (type === 'recovery') {
-            appHost = 'reset-password';
-            message = 'Opening Daaymn to reset your password...';
-        }
-        
-        // Construct the final deep link, preserving the original fragment from Supabase.
-        // The app will receive a URL like: com.daaymn.app://reset-password#access_token=...&refresh_token=...
-        const appUrl = `com.daaymn.app://${appHost}#${fragment}`;
 
-        document.getElementById('message').innerText = message;
-        
-        // Redirect to the app
+
+    if (type === 'recovery' && token) {
+        const appUrl = `com.daaymn.app://reset-password?type=recovery&access_token=${token}`;
+        document.getElementById('message').innerText = 'Opening Daaymn to reset your password...';
+        window.location.replace(appUrl);
+    } else if (type === 'signup') {
+        const appUrl = `com.daaymn.app://auth-callback`;
+        document.getElementById('message').innerText = 'Opening Daaymn to confirm your email...';
+
+
+
+
+
+
+
+
+
         window.location.replace(appUrl);
     } else {
         document.getElementById('message').innerText = 'Invalid or expired link. Please return to the app and request a new one.';
