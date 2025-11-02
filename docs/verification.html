@@ -29,32 +29,33 @@ h1 {
 </style>
 <script>
 function handleRedirect() {
-  const hash = window.location.hash;
+  const fragment = window.location.hash;
   const messageEl = document.getElementById('message');
 
-  // SCENARIO 1: Password Reset (Supabase sends hash with access_token, type=recovery, etc.)
-  if (hash.includes('type=recovery')) {
-    messageEl.innerText = 'Opening the app to reset your password...';
-    const appUrl = 'com.daaymn.app://reset-password' + hash;
+  // ✅ SCENARIO 1: PASSWORD RESET (Supabase adds #type=recovery...)
+  if (fragment && fragment.includes('type=recovery')) {
+    messageEl.innerText = 'Opening Daaymn so you can reset your password...';
+    // Convert #fragment → ?query for Android deep link
+    const appUrl = 'com.daaymn.app://reset-password?' + fragment.substring(1);
     window.location.replace(appUrl);
     return;
   }
 
-  // SCENARIO 2: Email Verification / Signup Confirmation
-  if (hash.includes('type=signup') || hash.includes('type=invite')) {
-    messageEl.innerText = 'Verifying your account... Opening the app.';
-    const appUrl = 'com.daaymn.app://auth-callback' + hash;
+  // ✅ SCENARIO 2: EMAIL VERIFICATION / SIGNUP CONFIRMATION
+  if (fragment && (fragment.includes('type=signup') || fragment.includes('type=invite'))) {
+    messageEl.innerText = 'Daaymn! You’re verified — opening the app...';
+    const appUrl = 'com.daaymn.app://auth-callback?' + fragment.substring(1);
     window.location.replace(appUrl);
     return;
   }
 
-  // SCENARIO 3: Any other link (fallback)
-  if (hash.includes('error=')) {
-    messageEl.innerText = 'This link is invalid or expired. Please open Daaymn and try again.';
+  // ✅ SCENARIO 3: INVALID OR EXPIRED LINK
+  if (fragment && fragment.includes('error=')) {
+    messageEl.innerText = 'This link is invalid or expired. Please open Daaymn and request a new link.';
     return;
   }
 
-  // SCENARIO 4: No fragment — show a generic message
+  // ✅ SCENARIO 4: NO FRAGMENT — GENERIC FALLBACK
   messageEl.innerText = 'Redirecting you to Daaymn...';
   const appUrl = 'com.daaymn.app://login';
   window.location.replace(appUrl);
