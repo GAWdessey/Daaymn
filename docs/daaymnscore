@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The #DaaymnScore Explained</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Bungee&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gradient-start: #FC00FF;
+            --gradient-end: #00DBDE;
+            --background-color: #121212;
+            --card-color: #1A1A1A;
+            --text-color: #E0E0E0;
+            --text-color-dark: #888888;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-family: 'Bungee', cursive;
+            font-size: 64px;
+            font-weight: 900;
+            color: #fff;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .header h1 .daaymn-style {
+            font-family: 'Pacifico', cursive;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(252, 0, 255, 0.5);
+        }
+        
+        .header p {
+            font-size: 18px;
+            color: var(--text-color-dark);
+            max-width: 600px;
+            margin: 15px auto 0;
+        }
+
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .pillar-card {
+            background-color: var(--card-color);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid #222;
+            text-align: center;
+        }
+
+        .pillar-card .weight {
+            font-family: 'Bungee', cursive;
+            font-size: 48px;
+            font-weight: 900;
+            margin: 0;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .pillar-card h2 {
+            font-family: 'Bungee', cursive;
+            font-size: 24px;
+            margin: 10px 0 15px 0;
+            color: #fff;
+        }
+
+        .pillar-card p {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text-color-dark);
+            margin: 0;
+        }
+        
+        .explanation-section {
+            margin-top: 80px;
+            background-color: var(--card-color);
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid #222;
+        }
+        
+        .explanation-section h2 {
+            text-align: center;
+            font-family: 'Bungee', cursive;
+            font-size: 32px;
+            color: #fff;
+            margin-bottom: 40px;
+        }
+
+        .metric {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .metric .icon {
+            font-size: 24px;
+            min-width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .metric .metric-info h3 {
+            margin: 0 0 5px 0;
+            color: #fff;
+            font-size: 18px;
+        }
+        
+        .metric .metric-info p {
+            margin: 0;
+            color: var(--text-color-dark);
+            font-size: 15px;
+        }
+
+        .metric .good {
+            color: #00DBDE;
+        }
+        
+        .metric .bad {
+            color: #FC00FF;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <header class="header">
+            <h1>The Science Behind The <span class="daaymn-style">#DaaymnScore</span></h1>
+            <p>Your Daaymn Score isn't random. It's a real-time, data-driven rating of your profile's performance and community standing. It’s the ultimate measure of where you stand.</p>
+        </header>
+
+        <section class="pillars-grid">
+            <div class="pillar-card">
+                <h3 class="weight">40%</h3>
+                <h2>Popularity</h2>
+                <p>A direct measure of your profile's appeal. It's how often other users see you and say 'Daaymn'.</p>
+            </div>
+            <div class="pillar-card">
+                <h3 class="weight">35%</h3>
+                <h2>Engagement</h2>
+                <p>Measures how actively you participate in the community. It's not just about matching, it's about connecting.</p>
+            </div>
+            <div class="pillar-card">
+                <h3 class="weight">25%</h3>
+                <h2>Safety</h2>
+                <p>The foundation of trust. This score reflects how safe and respectful you are perceived to be by others.</p>
+            </div>
+        </section>
+
+        <section class="explanation-section">
+            <h2>How It's Calculated</h2>
+
+            <div class="metric">
+                <div class="icon good">✔</div>
+                <div class="metric-info">
+                    <h3>Attractiveness Ratio</h3>
+                    <p>The core of your <strong>Popularity</strong>. It's the percentage of users who Like you versus Dislike you. A higher ratio means a stronger profile.</p>
+                </div>
+            </div>
+
+            <div class="metric">
+                <div class="icon good">✔</div>
+                <div class="metric-info">
+                    <h3>Match Rate & OTMs</h3>
+                    <p>The heart of <strong>Engagement</strong>. We reward you for sending likes that lead to matches and for making a bold first move with OTMs.</p>
+                </div>
+            </div>
+
+            <div class="metric">
+                <div class="icon bad">❌</div>
+                <div class="metric-info">
+                    <h3>Ghosting Rate</h3>
+                    <p>The biggest penalty to your <strong>Engagement</strong> score. Getting a match and never sending a message hurts your score significantly.</p>
+                </div>
+            </div>
+
+            <div class="metric">
+                <div class="icon bad">❌</div>
+                <div class="metric-info">
+                    <h3>Reports & Blocks</h3>
+                    <p>This defines your <strong>Safety</strong> score. Being reported or blocked by other users has a major negative impact and will cap your overall Daaymn Score, no matter how popular you are.</p>
+                </div>
+            </div>
+
+        </section>
+        
+    </div>
+</body>
+</html>
