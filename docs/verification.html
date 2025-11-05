@@ -24,7 +24,7 @@ window.onload = function() {
         document.getElementById('message').innerText = 'Opening Daaymn to reset your password...';
         window.location.replace(appUrl);
     } else if (type === 'signup') {
-        const appUrl = `com.daaymn.app://auth-callback`;
+        const appUrl = `com.daaymn.app://auth-callback?access_token=${token}`;
         document.getElementById('message').innerText = 'Opening Daaymn to confirm your email...';
 
 
