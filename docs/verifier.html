@@ -191,148 +191,120 @@
         </section>
     </div>
 
-    <script>
-    // --- Step 1: The decoder map, which is the reverse of the one in the Dart code ---
-    const alphaToChar = {
-        2: 'SOT', 3: 'EOT',
-        10: '0', 11: '1', 12: '2', 13: '3', 14: '4', 15: '5', 16: '6', 17: '7', 18: '8', 19: '9',
-        20: 'a', 21: 'b', 22: 'c', 23: 'd', 24: 'e', 25: 'f',
-        26: '-', 27: '@', 28: '.',
-    };
+        <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const scannerContainer = document.getElementById('scanner-container');
+        const statusText = document.getElementById('status-text');
+        const progressBar = document.getElementById('progress-bar');
+        const resultContainer = document.getElementById('result-container');
+        const resultText = document.getElementById('result-text');
 
-    const dropZone = document.getElementById('drop-zone');
-    const fileInput = document.getElementById('file-input');
-    const scannerContainer = document.getElementById('scanner-container');
-    const statusText = document.getElementById('status-text');
-    const progressBar = document.getElementById('progress-bar');
-    const resultContainer = document.getElementById('result-container');
-    const resultText = document.getElementById('result-text');
+        // Event Listeners
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleFile(e.dataTransfer.files[0]); });
 
-    // Event Listeners
-    dropZone.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-    dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleFile(e.dataTransfer.files[0]); });
+        function handleFile(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                alert('Please upload a valid image file (PNG or JPEG).');
+                return;
+            }
+            // Reset UI
+            dropZone.style.display = 'none';
+            resultContainer.style.display = 'none';
+            scannerContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            statusText.textContent = 'Initializing scanner...';
 
-    function handleFile(file) {
-        if (!file || !file.type.startsWith('image/png')) {
-            alert('Please upload a valid PNG image.');
-            return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => simulateScanAndDecode(img);
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
-        // Reset UI
-        dropZone.style.display = 'none';
-        resultContainer.style.display = 'none';
-        scannerContainer.style.display = 'block';
-        progressBar.style.width = '0%';
-        statusText.textContent = 'Initializing scanner...';
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => simulateScan(img);
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
+        function simulateScanAndDecode(image) {
+            statusText.textContent = 'Scanning for invisible watermark...';
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) progress = 100;
+                progressBar.style.width = progress + '%';
 
-    function simulateScan(image) {
-        let progress = 0;
-        statusText.textContent = 'Scanning image data...';
-        const interval = setInterval(() => {
-            progress += Math.random() * 15;
-            if (progress > 100) progress = 100;
-            progressBar.style.width = progress + '%';
-            if (progress >= 100) {
-                clearInterval(interval);
-                statusText.textContent = 'Extracting signature from transparency layer...';
-                setTimeout(() => extractAndVerifySignature(image), 300);
-            }
-        }, 200);
-    }
-
-    function extractAndVerifySignature(image) {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        canvas.width = image.width;
-        canvas.height = image.height;
-        ctx.drawImage(image, 0, 0);
-
-        try {
-            const signatureChars = [];
-            let endMarkerFound = false;
-            
-            // Read from the row 4 pixels up from the bottom to avoid optimization issues
-            const y = image.height - 5;
-
-            // Scan pixels from right-to-left along that row
-            for (let i = 0; i < canvas.width; i++) {
-                const x = canvas.width - 1 - i;
-                const pixelData = ctx.getImageData(x, y, 1, 1).data;
-                const alphaValue = pixelData[3]; // Read the Alpha channel value
-
-                if (alphaValue === 0) continue; // Skip pixels that were never touched
-
-                const decodedChar = alphaToChar[alphaValue];
-
-                if (decodedChar === 'EOT') { // End of Text marker
-                    endMarkerFound = true;
-                    continue;
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    decodeLsbSignature(image);
                 }
-                
-                if (endMarkerFound) {
-                    if (decodedChar === 'SOT') { // Start of Text marker
-                        break; // We're done
-                    }
-                    if (decodedChar) {
-                        signatureChars.push(decodedChar);
-                    }
+            }, 200);
+        }
+
+        function decodeLsbSignature(image) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            canvas.width = image.width;
+            canvas.height = image.height;
+            ctx.drawImage(image, 0, 0, image.width, image.height);
+            const imageData = ctx.getImageData(0, 0, image.width, image.height);
+            
+            const startMarker = '::SOT::';
+            const endMarker = '::EOT::';
+
+            let extractedBits = [];
+            for (let i = 0; i < imageData.data.length; i += 4) {
+                // Only read from pixels that are substantially visible
+                if (imageData.data[i + 3] > 200) {
+                    // Extract the least significant bit from the blue channel
+                    const lsb = imageData.data[i + 2] & 1;
+                    extractedBits.push(lsb);
                 }
             }
             
-            if (signatureChars.length > 0) {
-                // The array was built backwards, so we reverse it to get the correct order
-                const signature = signatureChars.reverse().join('');
+            // Convert the array of bits back into a string
+            let extractedString = "";
+            for (let i = 0; i < extractedBits.length; i += 8) {
+                if (i + 7 < extractedBits.length) {
+                    const byteBits = extractedBits.slice(i, i + 8);
+                    const charCode = parseInt(byteBits.join(''), 2);
+                    extractedString += String.fromCharCode(charCode);
+                }
+            }
+
+            // Look for our start and end markers
+            const startIndex = extractedString.indexOf(startMarker);
+            const endIndex = extractedString.indexOf(endMarker);
+
+            if (startIndex !== -1 && endIndex > startIndex) {
+                const signature = extractedString.substring(startIndex + startMarker.length, endIndex);
                 checkSignatureWithBackend(signature);
             } else {
-                displayResult(false, "Verification Failed: No signature found.");
+                displayResult(false, "Verification Failed: No watermark found.");
             }
-        } catch (e) {
-            console.error(e);
-            displayResult(false, 'Error: Could not scan image.');
         }
-    }
-    
-    async function checkSignatureWithBackend(signature) {
-        statusText.textContent = 'Verifying signature with Daaymn servers...';
         
-        console.log("Verifying signature:", signature);
-        
-        // This is where you would call your real Supabase function in production
-        // const response = await fetch('YOUR_SUPABASE_FUNCTION_URL/check-signature', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({ signature: signature })
-        // });
-        // const { isVerified } = await response.json();
-        
-        // For testing, we simulate success if the signature has the correct format
-        const isVerified = signature && signature.includes('@');
-        
-        setTimeout(() => displayResult(isVerified), 800);
-    }
+        async function checkSignatureWithBackend(signature) {
+            statusText.textContent = 'Verifying signature with Daaymn servers...';
+            console.log("Verifying signature from LSB:", signature);
+            // This is where you would call your real Supabase function
+            const isVerified = signature && signature.includes('@');
+            setTimeout(() => displayResult(isVerified), 800);
+        }
 
-    function displayResult(isVerified, message) {
-        scannerContainer.style.display = 'none';
-        resultContainer.style.display = 'block';
-        if (isVerified) {
-            resultText.textContent = '100% Daaymn Verified!';
-            resultText.className = 'verified';
-        } else {
-            resultText.textContent = message || 'Verification Failed!';
-            resultText.className = 'failed';
+        function displayResult(isVerified, message) {
+            scannerContainer.style.display = 'none';
+            resultContainer.style.display = 'block';
+            if (isVerified) {
+                resultText.textContent = '100% Daaymn Verified!';
+                resultText.className = 'verified';
+            } else {
+                resultText.textContent = message || 'Verification Failed!';
+                resultText.className = 'failed';
+            }
         }
-    }
-</script>
+    </script>
 </body>
 </html>
