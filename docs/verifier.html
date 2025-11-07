@@ -8,190 +8,24 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Bungee&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --gradient-start: #FC00FF;
-            --gradient-end: #00DBDE;
-            --background-color: #121212;
-            --card-color: #1A1A1A;
-            --text-color: #E0E0E0;
-            --text-color-dark: #888888;
-            --error-color: #FC00FF;
-        }
-
-        body {
-            margin: 0;
-            padding: 40px 20px;
-            font-family: 'Inter', sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
-
-        .main-container {
-            max-width: 700px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-family: 'Bungee', cursive;
-            font-size: 56px;
-            font-weight: 900;
-            color: #fff;
-            margin: 0;
-            line-height: 1.2;
-        }
-
-        .header .daaymn-style {
-            font-family: 'Pacifico', cursive;
-            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 15px rgba(252, 0, 255, 0.5);
-        }
-        
-        .header p {
-            font-size: 18px;
-            color: var(--text-color-dark);
-            max-width: 600px;
-            margin: 15px auto 40px;
-        }
-
-        .verifier-card {
-            background-color: var(--card-color);
-            padding: 40px;
-            border-radius: 15px;
-            border: 1px solid #222;
-        }
-
-        #drop-zone {
-            border: 2px dashed var(--text-color-dark);
-            border-radius: 10px;
-            padding: 60px 20px;
-            cursor: pointer;
-            transition: background-color 0.3s, border-color 0.3s;
-        }
-
-        #drop-zone.drag-over {
-            background-color: #222;
-            border-color: var(--gradient-end);
-        }
-
-        #drop-zone p {
-            margin: 0;
-            font-size: 18px;
-            color: var(--text-color-dark);
-        }
-        
-        #file-input {
-            display: none;
-        }
-
-        #scanner-container {
-            padding: 20px 0;
-        }
-        
-        #status-text {
-            font-size: 18px;
-            color: var(--text-color-dark);
-            margin-bottom: 20px;
-            height: 25px;
-            transition: all 0.3s ease;
-        }
-
-        .progress-bar-container {
-            width: 100%;
-            height: 20px;
-            background-color: #2a2a2a;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        #progress-bar {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
-            border-radius: 10px;
-            transition: width 0.2s ease-out;
-        }
-        
-        #result-container {
-            margin-top: 20px;
-        }
-        
-        #result-text {
-            font-family: 'Bungee', cursive;
-            /* This is the key change for responsive font size that shrinks to fit */
-            font-size: clamp(28px, 8vw, 48px);
-            margin: 20px 0 0 0;
-            line-height: 1.2;
-            word-wrap: break-word; /* Ensures long text without spaces can wrap */
-        }
-
-        .verified {
-             background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .failed {
-            color: var(--error-color);
-        }
-
-        /* --- MOBILE STYLES --- */
-        @media (max-width: 600px) {
-            body {
-                padding: 20px 15px; /* Less padding on mobile */
-            }
-            .header h1 {
-                font-size: 42px; /* Smaller header font */
-            }
-            .header p {
-                font-size: 16px;
-                margin-bottom: 30px;
-            }
-            .verifier-card {
-                padding: 25px; /* Less padding inside the card */
-            }
-            #drop-zone {
-                padding: 40px 15px;
-            }
-        }
+        :root { --gradient-start: #FC00FF; --gradient-end: #00DBDE; --background-color: #121212; --card-color: #1A1A1A; --text-color: #E0E0E0; --text-color-dark: #888888; --error-color: #FC00FF; } body { margin: 0; padding: 40px 20px; font-family: 'Inter', sans-serif; background-color: var(--background-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; } .main-container { max-width: 700px; width: 100%; text-align: center; } .header h1 { font-family: 'Bungee', cursive; font-size: 56px; font-weight: 900; color: #fff; margin: 0; line-height: 1.2; } .header .daaymn-style { font-family: 'Pacifico', cursive; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 15px rgba(252, 0, 255, 0.5); } .header p { font-size: 18px; color: var(--text-color-dark); max-width: 600px; margin: 15px auto 40px; } .verifier-card { background-color: var(--card-color); padding: 40px; border-radius: 15px; border: 1px solid #222; } #drop-zone { border: 2px dashed var(--text-color-dark); border-radius: 10px; padding: 60px 20px; cursor: pointer; transition: background-color 0.3s, border-color 0.3s; } #drop-zone.drag-over { background-color: #222; border-color: var(--gradient-end); } #drop-zone p { margin: 0; font-size: 18px; color: var(--text-color-dark); } #file-input { display: none; } #scanner-container { padding: 20px 0; } #status-text { font-size: 18px; color: var(--text-color-dark); margin-bottom: 20px; height: 25px; transition: all 0.3s ease; } .progress-bar-container { width: 100%; height: 20px; background-color: #2a2a2a; border-radius: 10px; overflow: hidden; } #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); border-radius: 10px; transition: width 0.2s ease-out; } #result-container { margin-top: 20px; } #result-text { font-family: 'Bungee', cursive; font-size: clamp(28px, 8vw, 48px); margin: 20px 0 0 0; line-height: 1.2; word-wrap: break-word; } .verified { background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; } .failed { color: var(--error-color); } @media (max-width: 600px) { body { padding: 20px 15px; } .header h1 { font-size: 42px; } .header p { font-size: 16px; margin-bottom: 30px; } .verifier-card { padding: 25px; } #drop-zone { padding: 40px 15px; } }
     </style>
 </head>
 <body>
     <div class="main-container">
-        <header class="header">
-            <h1><span class="daaymn-style">Daaymn</span> Score Verifier</h1>
-            <p>Upload a #DaaymnScore Badge or Report Card to instantly verify its authenticity.</p>
-        </header>
-
+        <header class="header"><h1><span class="daaymn-style">Daaymn</span> Score Verifier</h1><p>Upload a #DaaymnScore Badge or Report Card to instantly verify its authenticity.</p></header>
         <section class="verifier-card">
-            <div id="drop-zone">
-                <p>Drop image here, or click to select a file</p>
-            </div>
-            <input type="file" id="file-input" accept="image/png">
-
-            <div id="scanner-container" style="display: none;">
-                <p id="status-text">Preparing to scan...</p>
-                <div class="progress-bar-container">
-                    <div id="progress-bar"></div>
-                </div>
-            </div>
-
-            <div id="result-container" style="display: none;">
-                 <p id="result-text"></p>
-            </div>
+            <div id="drop-zone"><p>Drop image here, or click to select a file</p></div>
+            <input type="file" id="file-input" accept="image/png,image/jpeg">
+            <div id="scanner-container" style="display: none;"><p id="status-text">Preparing to scan...</p><div class="progress-bar-container"><div id="progress-bar"></div></div></div>
+            <div id="result-container" style="display: none;"><p id="result-text"></p></div>
         </section>
     </div>
 
-        <script>
+    <!-- 1. Include the jsQR library -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
+    <script>
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
         const scannerContainer = document.getElementById('scanner-container');
@@ -200,7 +34,6 @@
         const resultContainer = document.getElementById('result-container');
         const resultText = document.getElementById('result-text');
 
-        // Event Listeners
         dropZone.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
         dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
@@ -212,7 +45,6 @@
                 alert('Please upload a valid image file (PNG or JPEG).');
                 return;
             }
-            // Reset UI
             dropZone.style.display = 'none';
             resultContainer.style.display = 'none';
             scannerContainer.style.display = 'block';
@@ -229,67 +61,42 @@
         }
 
         function simulateScanAndDecode(image) {
-            statusText.textContent = 'Scanning for invisible watermark...';
+            statusText.textContent = 'Scanning for QR code...';
             let progress = 0;
             const interval = setInterval(() => {
                 progress += Math.random() * 15;
                 if (progress > 100) progress = 100;
                 progressBar.style.width = progress + '%';
-
                 if (progress >= 100) {
                     clearInterval(interval);
-                    decodeLsbSignature(image);
+                    decodeQrCode(image);
                 }
             }, 200);
         }
 
-        function decodeLsbSignature(image) {
+        function decodeQrCode(image) {
             const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            const ctx = canvas.getContext('2d');
             canvas.width = image.width;
             canvas.height = image.height;
             ctx.drawImage(image, 0, 0, image.width, image.height);
             const imageData = ctx.getImageData(0, 0, image.width, image.height);
             
-            const startMarker = '::SOT::';
-            const endMarker = '::EOT::';
+            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                inversionAttempts: "dontInvert",
+            });
 
-            let extractedBits = [];
-            for (let i = 0; i < imageData.data.length; i += 4) {
-                // Only read from pixels that are substantially visible
-                if (imageData.data[i + 3] > 0) {
-                    // Extract the least significant bit from the blue channel
-                    const lsb = imageData.data[i + 2] & 1;
-                    extractedBits.push(lsb);
-                }
-            }
-            
-            // Convert the array of bits back into a string
-            let extractedString = "";
-            for (let i = 0; i < extractedBits.length; i += 8) {
-                if (i + 7 < extractedBits.length) {
-                    const byteBits = extractedBits.slice(i, i + 8);
-                    const charCode = parseInt(byteBits.join(''), 2);
-                    extractedString += String.fromCharCode(charCode);
-                }
-            }
-
-            // Look for our start and end markers
-            const startIndex = extractedString.indexOf(startMarker);
-            const endIndex = extractedString.indexOf(endMarker);
-
-            if (startIndex !== -1 && endIndex > startIndex) {
-                const signature = extractedString.substring(startIndex + startMarker.length, endIndex);
-                checkSignatureWithBackend(signature);
+            if (code && code.data) {
+                checkSignatureWithBackend(code.data);
             } else {
-                displayResult(false, "Verification Failed: No watermark found.");
+                displayResult(false, "Verification Failed: No QR code found.");
             }
         }
         
         async function checkSignatureWithBackend(signature) {
             statusText.textContent = 'Verifying signature with Daaymn servers...';
-            console.log("Verifying signature from LSB:", signature);
-            // This is where you would call your real Supabase function
+            console.log("Verifying signature from QR Code:", signature);
+            // This is where you call your real Supabase function
             const isVerified = signature && signature.includes('@');
             setTimeout(() => displayResult(isVerified), 800);
         }
