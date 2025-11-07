@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daaymn Score Verifier</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Bungee&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Include the EXIF Reader library -->
+    <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+    <style>
+        :root {
+            --gradient-start: #FC00FF;
+            --gradient-end: #00DBDE;
+            --background-color: #121212;
+            --card-color: #1A1A1A;
+            --text-color: #E0E0E0;
+            --text-color-dark: #888888;
+        }
+        /* ... (The rest of your CSS remains the same as I provided before) ... */
+    </style>
+</head>
+<body>
+    <!-- ... (The HTML body remains the same as I provided before) ... -->
+
+    <script>
+        // ... (The variable declarations remain the same) ...
+
+        function handleFile(file) {
+            // ... (File handling and reader setup is the same) ...
+            
+            // --- UPDATED LOGIC ---
+            // Use EXIF.js to read metadata
+            EXIF.getData(file, function() {
+                const signature = EXIF.getTag(this, "UserComment");
+                
+                // Now, simulate the scan and then verify the extracted signature
+                simulateScan(signature);
+            });
+        }
+
+        function simulateScan(signature) {
+            let progress = 0;
+            statusText.textContent = 'Scanning image data...';
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) progress = 100;
+                progressBar.style.width = progress + '%';
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    statusText.textContent = 'Verifying signature with Daaymn servers...';
+                    // After the animation, run the actual check on the extracted signature
+                    setTimeout(() => checkSignatureWithBackend(signature), 500);
+                }
+            }, 200);
+        }
+
+        async function checkSignatureWithBackend(signature) {
+            if (!signature) {
+                displayResult(false, "Verification Failed: No signature found.");
+                return;
+            }
+
+            // --- BACKEND ACTION (Coming in Part 3) ---
+            // In a real implementation, you would make an API call here.
+            // const response = await fetch('YOUR_SUPABASE_FUNCTION_URL/check-signature', {
+            //   method: 'POST',
+            //   headers: { 'Content-Type': 'application/json' },
+            //   body: JSON.stringify({ signature: signature })
+            // });
+            // const { isVerified } = await response.json();
+            
+            // For now, we'll simulate a successful verification if a signature exists.
+            const isVerified = (signature.includes('@')); 
+            
+            displayResult(isVerified);
+        }
+        
+        function displayResult(isVerified, message) {
+            // ... (This function remains the same as I provided before) ...
+        }
+    </script>
+</body>
+</html>
