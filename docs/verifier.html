@@ -3,115 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daaymn Score Verifier</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Bungee&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>Daaymn Report Verification</title>
     <style>
-        :root { --gradient-start: #FC00FF; --gradient-end: #00DBDE; --background-color: #121212; --card-color: #1A1A1A; --text-color: #E0E0E0; --text-color-dark: #888888; --error-color: #FC00FF; } body { margin: 0; padding: 40px 20px; font-family: 'Inter', sans-serif; background-color: var(--background-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; } .main-container { max-width: 700px; width: 100%; text-align: center; } .header h1 { font-family: 'Bungee', cursive; font-size: 56px; font-weight: 900; color: #fff; margin: 0; line-height: 1.2; } .header .daaymn-style { font-family: 'Pacifico', cursive; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 15px rgba(252, 0, 255, 0.5); } .header p { font-size: 18px; color: var(--text-color-dark); max-width: 600px; margin: 15px auto 40px; } .verifier-card { background-color: var(--card-color); padding: 40px; border-radius: 15px; border: 1px solid #222; } #drop-zone { border: 2px dashed var(--text-color-dark); border-radius: 10px; padding: 60px 20px; cursor: pointer; transition: background-color 0.3s, border-color 0.3s; } #drop-zone.drag-over { background-color: #222; border-color: var(--gradient-end); } #drop-zone p { margin: 0; font-size: 18px; color: var(--text-color-dark); } #file-input { display: none; } #scanner-container { padding: 20px 0; } #status-text { font-size: 18px; color: var(--text-color-dark); margin-bottom: 20px; height: 25px; transition: all 0.3s ease; } .progress-bar-container { width: 100%; height: 20px; background-color: #2a2a2a; border-radius: 10px; overflow: hidden; } #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); border-radius: 10px; transition: width 0.2s ease-out; } #result-container { margin-top: 20px; } #result-text { font-family: 'Bungee', cursive; font-size: clamp(28px, 8vw, 48px); margin: 20px 0 0 0; line-height: 1.2; word-wrap: break-word; } .verified { background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; } .failed { color: var(--error-color); } @media (max-width: 600px) { body { padding: 20px 15px; } .header h1 { font-size: 42px; } .header p { font-size: 16px; margin-bottom: 30px; } .verifier-card { padding: 25px; } #drop-zone { padding: 40px 15px; } }
+        @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;700&display=swap');
+
+        :root {
+            --background-color: #121212;
+            --card-color: #1E1E1E;
+            --text-color: #E0E0E0;
+            --gradient-start: #FC00FF;
+            --gradient-end: #00DBDE;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #verification-card {
+            background-color: var(--card-color);
+            border-radius: 15px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .daaymn-title {
+            font-family: 'Bungee', cursive;
+            font-size: 48px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+        }
+
+        .status-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        .success { color: var(--success-color); }
+        .error { color: var(--error-color); }
+        .loading {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-top-color: var(--gradient-end);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 25px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        strong {
+            font-weight: 700;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        /* Hide all result views by default */
+        .result-view {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <header class="header"><h1><span class="daaymn-style">Daaymn</span> Score Verifier</h1><p>Upload a #DaaymnScore Badge or Report Card to instantly verify its authenticity.</p></header>
-        <section class="verifier-card">
-            <div id="drop-zone"><p>Drop image here, or click to select a file</p></div>
-            <input type="file" id="file-input" accept="image/png,image/jpeg">
-            <div id="scanner-container" style="display: none;"><p id="status-text">Preparing to scan...</p><div class="progress-bar-container"><div id="progress-bar"></div></div></div>
-            <div id="result-container" style="display: none;"><p id="result-text"></p></div>
-        </section>
+
+    <div id="verification-card">
+        <h1 class="daaymn-title">Daaymn</h1>
+
+        <!-- Loading View -->
+        <div id="loading-view" class="result-view">
+            <div class="loading"></div>
+            <p>Verifying report...</p>
+        </div>
+
+        <!-- Success View -->
+        <div id="success-view" class="result-view">
+            <div class="status-icon success">&#10004;</div>
+            <p>
+                This report is verified.<br>
+                It belongs to <strong id="user-name"></strong> with a score of <strong id="user-score"></strong>/10.
+            </p>
+        </div>
+
+        <!-- Error View -->
+        <div id="error-view" class="result-view">
+            <div class="status-icon error">&#10060;</div>
+            <p id="error-message">This report ID is invalid or could not be found.</p>
+        </div>
+
     </div>
 
-    <!-- 1. Include the jsQR library -->
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-
     <script>
-        const dropZone = document.getElementById('drop-zone');
-        const fileInput = document.getElementById('file-input');
-        const scannerContainer = document.getElementById('scanner-container');
-        const statusText = document.getElementById('status-text');
-        const progressBar = document.getElementById('progress-bar');
-        const resultContainer = document.getElementById('result-container');
-        const resultText = document.getElementById('result-text');
+        // --- CONFIGURATION ---
+        // IMPORTANT: Replace these with your actual Supabase URL and Anon Key.
+        const SUPABASE_FUNCTION_URL = 'YOUR_SUPABASE_URL/functions/v1/verify-report';
 
-        dropZone.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-        dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleFile(e.dataTransfer.files[0]); });
+        // --- SCRIPT LOGIC ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            const loadingView = document.getElementById('loading-view');
+            const successView = document.getElementById('success-view');
+            const errorView = document.getElementById('error-view');
+            const errorMessage = document.getElementById('error-message');
 
-        function handleFile(file) {
-            if (!file || !file.type.startsWith('image/')) {
-                alert('Please upload a valid image file (PNG or JPEG).');
+            const showView = (view) => {
+                document.querySelectorAll('.result-view').forEach(v => v.style.display = 'none');
+                view.style.display = 'block';
+            };
+
+            showView(loadingView);
+
+            const params = new URLSearchParams(window.location.search);
+            const reportId = params.get('id');
+
+            if (!reportId) {
+                errorMessage.textContent = 'No report ID was provided in the URL.';
+                showView(errorView);
                 return;
             }
-            dropZone.style.display = 'none';
-            resultContainer.style.display = 'none';
-            scannerContainer.style.display = 'block';
-            progressBar.style.width = '0%';
-            statusText.textContent = 'Initializing scanner...';
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => simulateScanAndDecode(img);
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
+            try {
+                const response = await fetch(SUPABASE_FUNCTION_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: reportId }),
+                });
 
-        function simulateScanAndDecode(image) {
-            statusText.textContent = 'Scanning for QR code...';
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += Math.random() * 15;
-                if (progress > 100) progress = 100;
-                progressBar.style.width = progress + '%';
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    decodeQrCode(image);
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('user-name').textContent = data.user_name;
+                    document.getElementById('user-score').textContent = parseFloat(data.score).toFixed(1);
+                    showView(successView);
+                } else {
+                    errorMessage.textContent = 'This report ID is invalid or could not be found.';
+                    showView(errorView);
                 }
-            }, 200);
-        }
-
-        function decodeQrCode(image) {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = image.width;
-            canvas.height = image.height;
-            ctx.drawImage(image, 0, 0, image.width, image.height);
-            const imageData = ctx.getImageData(0, 0, image.width, image.height);
-            
-            const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                inversionAttempts: "dontInvert",
-            });
-
-            if (code && code.data) {
-                checkSignatureWithBackend(code.data);
-            } else {
-                displayResult(false, "Verification Failed: No QR code found.");
+            } catch (err) {
+                console.error('Verification failed:', err);
+                errorMessage.textContent = 'An error occurred while trying to verify the report. Please try again later.';
+                showView(errorView);
             }
-        }
-        
-        async function checkSignatureWithBackend(signature) {
-            statusText.textContent = 'Verifying signature with Daaymn servers...';
-            console.log("Verifying signature from QR Code:", signature);
-            // This is where you call your real Supabase function
-            const isVerified = signature && signature.includes('@');
-            setTimeout(() => displayResult(isVerified), 800);
-        }
-
-        function displayResult(isVerified, message) {
-            scannerContainer.style.display = 'none';
-            resultContainer.style.display = 'block';
-            if (isVerified) {
-                resultText.textContent = '100% Daaymn Verified!';
-                resultText.className = 'verified';
-            } else {
-                resultText.textContent = message || 'Verification Failed!';
-                resultText.className = 'failed';
-            }
-        }
+        });
     </script>
+
 </body>
 </html>
