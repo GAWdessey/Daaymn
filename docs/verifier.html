@@ -15,9 +15,154 @@
             --card-color: #1A1A1A;
             --text-color: #E0E0E0;
             --text-color-dark: #888888;
+            --error-color: #FC00FF;
         }
-        /* The CSS is identical to my previous correct response, so it is omitted here for brevity */
-         body { margin: 0; padding: 40px 20px; font-family: 'Inter', sans-serif; background-color: var(--background-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; } .main-container { max-width: 700px; width: 100%; text-align: center; } .header h1 { font-family: 'Bungee', cursive; font-size: 56px; font-weight: 900; color: #fff; margin: 0; line-height: 1.2; } .header .daaymn-style { font-family: 'Pacifico', cursive; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 15px rgba(252, 0, 255, 0.5); } .header p { font-size: 18px; color: var(--text-color-dark); max-width: 600px; margin: 15px auto 40px; } .verifier-card { background-color: var(--card-color); padding: 40px; border-radius: 15px; border: 1px solid #222; } #drop-zone { border: 2px dashed var(--text-color-dark); border-radius: 10px; padding: 60px 20px; cursor: pointer; transition: background-color 0.3s, border-color 0.3s; } #drop-zone.drag-over { background-color: #222; border-color: var(--gradient-end); } #drop-zone p { margin: 0; font-size: 18px; color: var(--text-color-dark); } #file-input { display: none; } #scanner-container { padding: 20px 0; } #status-text { font-size: 18px; color: var(--text-color-dark); margin-bottom: 20px; height: 25px; } .progress-bar-container { width: 100%; height: 20px; background-color: #2a2a2a; border-radius: 10px; overflow: hidden; } #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); border-radius: 10px; transition: width 0.2s ease-out; } #result-container { margin-top: 20px; } #result-text { font-family: 'Bungee', cursive; font-size: 48px; margin: 20px 0 0 0; } .verified { background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; } .failed { color: var(--error-color); }
+
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .main-container {
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-family: 'Bungee', cursive;
+            font-size: 56px;
+            font-weight: 900;
+            color: #fff;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .header .daaymn-style {
+            font-family: 'Pacifico', cursive;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(252, 0, 255, 0.5);
+        }
+        
+        .header p {
+            font-size: 18px;
+            color: var(--text-color-dark);
+            max-width: 600px;
+            margin: 15px auto 40px;
+        }
+
+        .verifier-card {
+            background-color: var(--card-color);
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid #222;
+        }
+
+        #drop-zone {
+            border: 2px dashed var(--text-color-dark);
+            border-radius: 10px;
+            padding: 60px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        #drop-zone.drag-over {
+            background-color: #222;
+            border-color: var(--gradient-end);
+        }
+
+        #drop-zone p {
+            margin: 0;
+            font-size: 18px;
+            color: var(--text-color-dark);
+        }
+        
+        #file-input {
+            display: none;
+        }
+
+        #scanner-container {
+            padding: 20px 0;
+        }
+        
+        #status-text {
+            font-size: 18px;
+            color: var(--text-color-dark);
+            margin-bottom: 20px;
+            height: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            border-radius: 10px;
+            transition: width 0.2s ease-out;
+        }
+        
+        #result-container {
+            margin-top: 20px;
+        }
+        
+        #result-text {
+            font-family: 'Bungee', cursive;
+            /* This is the key change for responsive font size that shrinks to fit */
+            font-size: clamp(28px, 8vw, 48px);
+            margin: 20px 0 0 0;
+            line-height: 1.2;
+            word-wrap: break-word; /* Ensures long text without spaces can wrap */
+        }
+
+        .verified {
+             background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .failed {
+            color: var(--error-color);
+        }
+
+        /* --- MOBILE STYLES --- */
+        @media (max-width: 600px) {
+            body {
+                padding: 20px 15px; /* Less padding on mobile */
+            }
+            .header h1 {
+                font-size: 42px; /* Smaller header font */
+            }
+            .header p {
+                font-size: 16px;
+                margin-bottom: 30px;
+            }
+            .verifier-card {
+                padding: 25px; /* Less padding inside the card */
+            }
+            #drop-zone {
+                padding: 40px 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -116,11 +261,13 @@
         try {
             const signatureChars = [];
             let endMarkerFound = false;
+            
+            // Read from the row 4 pixels up from the bottom to avoid optimization issues
+            const y = image.height - 5;
 
-            // Scan pixels from bottom-right backwards along the last row
+            // Scan pixels from right-to-left along that row
             for (let i = 0; i < canvas.width; i++) {
                 const x = canvas.width - 1 - i;
-                const y = canvas.height - 1;
                 const pixelData = ctx.getImageData(x, y, 1, 1).data;
                 const alphaValue = pixelData[3]; // Read the Alpha channel value
 
@@ -160,6 +307,16 @@
         statusText.textContent = 'Verifying signature with Daaymn servers...';
         
         console.log("Verifying signature:", signature);
+        
+        // This is where you would call your real Supabase function in production
+        // const response = await fetch('YOUR_SUPABASE_FUNCTION_URL/check-signature', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify({ signature: signature })
+        // });
+        // const { isVerified } = await response.json();
+        
+        // For testing, we simulate success if the signature has the correct format
         const isVerified = signature && signature.includes('@');
         
         setTimeout(() => displayResult(isVerified), 800);
