@@ -47,6 +47,14 @@
     </div>
 
     <script>
+    // --- Step 1: The decoder map, which is the reverse of the one in the Dart code ---
+    const alphaToChar = {
+        2: 'SOT', 3: 'EOT',
+        10: '0', 11: '1', 12: '2', 13: '3', 14: '4', 15: '5', 16: '6', 17: '7', 18: '8', 19: '9',
+        20: 'a', 21: 'b', 22: 'c', 23: 'd', 24: 'e', 25: 'f',
+        26: '-', 27: '@', 28: '.',
+    };
+
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
     const scannerContainer = document.getElementById('scanner-container');
@@ -62,7 +70,6 @@
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
     dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleFile(e.dataTransfer.files[0]); });
 
-    // --- Core Logic ---
     function handleFile(file) {
         if (!file || !file.type.startsWith('image/png')) {
             alert('Please upload a valid PNG image.');
@@ -87,15 +94,13 @@
     function simulateScan(image) {
         let progress = 0;
         statusText.textContent = 'Scanning image data...';
-
         const interval = setInterval(() => {
             progress += Math.random() * 15;
             if (progress > 100) progress = 100;
             progressBar.style.width = progress + '%';
-
             if (progress >= 100) {
                 clearInterval(interval);
-                statusText.textContent = 'Extracting signature from pixels...';
+                statusText.textContent = 'Extracting signature from transparency layer...';
                 setTimeout(() => extractAndVerifySignature(image), 300);
             }
         }, 200);
@@ -109,7 +114,7 @@
         ctx.drawImage(image, 0, 0);
 
         try {
-            const signatureBytes = [];
+            const signatureChars = [];
             let endMarkerFound = false;
 
             // Scan pixels from bottom-right backwards along the last row
@@ -117,33 +122,34 @@
                 const x = canvas.width - 1 - i;
                 const y = canvas.height - 1;
                 const pixelData = ctx.getImageData(x, y, 1, 1).data;
-                
-                // --- FIX #1: Read the BLUE channel, not the alpha channel ---
-                const blueValue = pixelData[2];
+                const alphaValue = pixelData[3]; // Read the Alpha channel value
 
-                if (blueValue === 3) { // End of Text marker
+                if (alphaValue === 0) continue; // Skip pixels that were never touched
+
+                const decodedChar = alphaToChar[alphaValue];
+
+                if (decodedChar === 'EOT') { // End of Text marker
                     endMarkerFound = true;
                     continue;
                 }
                 
                 if (endMarkerFound) {
-                    if (blueValue === 2) { // Start of Text marker
+                    if (decodedChar === 'SOT') { // Start of Text marker
                         break; // We're done
                     }
-                    signatureBytes.push(blueValue);
+                    if (decodedChar) {
+                        signatureChars.push(decodedChar);
+                    }
                 }
             }
             
-            if (signatureBytes.length > 0) {
-                // --- FIX #2: Reverse the array before converting to a string ---
-                const reversedBytes = signatureBytes.reverse();
-                const signature = String.fromCharCode(...reversedBytes);
-
+            if (signatureChars.length > 0) {
+                // The array was built backwards, so we reverse it to get the correct order
+                const signature = signatureChars.reverse().join('');
                 checkSignatureWithBackend(signature);
             } else {
                 displayResult(false, "Verification Failed: No signature found.");
             }
-
         } catch (e) {
             console.error(e);
             displayResult(false, 'Error: Could not scan image.');
@@ -152,16 +158,7 @@
     
     async function checkSignatureWithBackend(signature) {
         statusText.textContent = 'Verifying signature with Daaymn servers...';
-
-        // This is where you call your real Supabase function
-        // const response = await fetch('YOUR_SUPABASE_FUNCTION_URL/check-signature', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({ signature: signature })
-        // });
-        // const { isVerified } = await response.json();
         
-        // Simulate a backend check
         console.log("Verifying signature:", signature);
         const isVerified = signature && signature.includes('@');
         
