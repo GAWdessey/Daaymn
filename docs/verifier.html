@@ -1,32 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daaymn Score Verifier</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Bungee&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        :root { --gradient-start: #FC00FF; --gradient-end: #00DBDE; --background-color: #121212; --card-color: #1A1A1A; --text-color: #E0E0E0; --text-color-dark: #888888; --error-color: #FC00FF; } body { margin: 0; padding: 40px 20px; font-family: 'Inter', sans-serif; background-color: var(--background-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; } .main-container { max-width: 700px; width: 100%; text-align: center; } .header h1 { font-family: 'Bungee', cursive; font-size: 56px; font-weight: 900; color: #fff; margin: 0; line-height: 1.2; } .header .daaymn-style { font-family: 'Pacifico', cursive; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 15px rgba(252, 0, 255, 0.5); } .header p { font-size: 18px; color: var(--text-color-dark); max-width: 600px; margin: 15px auto 40px; } .verifier-card { background-color: var(--card-color); padding: 40px; border-radius: 15px; border: 1px solid #222; } #drop-zone { border: 2px dashed var(--text-color-dark); border-radius: 10px; padding: 60px 20px; cursor: pointer; transition: background-color 0.3s, border-color 0.3s; } #drop-zone.drag-over { background-color: #222; border-color: var(--gradient-end); } #drop-zone p { margin: 0; font-size: 18px; color: var(--text-color-dark); } #file-input { display: none; } #scanner-container { padding: 20px 0; } #status-text { font-size: 18px; color: var(--text-color-dark); margin-bottom: 20px; height: 25px; transition: all 0.3s ease; } .progress-bar-container { width: 100%; height: 20px; background-color: #2a2a2a; border-radius: 10px; overflow: hidden; } #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); border-radius: 10px; transition: width 0.2s ease-out; } #result-container { margin-top: 20px; } #result-text { font-family: 'Bungee', cursive; font-size: clamp(28px, 8vw, 48px); margin: 20px 0 0 0; line-height: 1.2; word-wrap: break-word; } .verified { background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; } .failed { color: var(--error-color); } @media (max-width: 600px) { body { padding: 20px 15px; } .header h1 { font-size: 42px; } .header p { font-size: 16px; margin-bottom: 30px; } .verifier-card { padding: 25px; } #drop-zone { padding: 40px 15px; } }
-    </style>
-</head>
-<body>
-    <div class="main-container">
-        <header class="header"><h1><span class="daaymn-style">Daaymn</span> Score Verifier</h1><p>Upload a #DaaymnScore Badge or Report Card to instantly verify its authenticity.</p></header>
-        <section class="verifier-card">
-            <div id="drop-zone"><p>Drop image here, or click to select a file</p></div>
-            <input type="file" id="file-input" accept="image/png,image/jpeg">
-            <div id="scanner-container" style="display: none;"><p id="status-text">Preparing to scan...</p><div class="progress-bar-container"><div id="progress-bar"></div></div></div>
-            <div id="result-container" style="display: none;"><p id="result-text"></p></div>
-        </section>
-    </div>
-
-    <!-- 1. Include the jsQR library -->
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-
     <script>
-        // *** THIS IS THE ENTIRE FIXED SCRIPT ***
+        // *** THIS IS THE FINAL, CORRECTED SCRIPT ***
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
         const scannerContainer = document.getElementById('scanner-container');
@@ -86,37 +59,25 @@
             ctx.drawImage(image, 0, 0, image.width, image.height);
             const imageData = ctx.getImageData(0, 0, image.width, image.height);
             
-            // Try scanning normally
-            let code = jsQR(imageData.data, imageData.width, imageData.height);
-            
-            // If not found, try with inversion (for QR codes with dark backgrounds)
-            if (!code) {
-                 code = jsQR(imageData.data, imageData.width, imageData.height, {
-                    inversionAttempts: "invertFirst",
-                });
-            }
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
 
             if (code && code.data) {
+                // The QR code data is now just the UUID.
                 checkSignatureWithBackend(code.data);
             } else {
                 displayResult(false, "Verification Failed: No signature found in image.");
             }
         }
         
-        async function checkSignatureWithBackend(signature) {
+        async function checkSignatureWithBackend(uuid) {
             statusText.textContent = 'Verifying signature with Daaymn servers...';
             
-            if (!signature || !signature.includes('@')) {
+            if (!uuid) {
                 return displayResult(false, 'Verification Failed: Invalid signature format.');
             }
 
-            const [uuid, scoreFromQr] = signature.split('@');
-            
-            if (!uuid || !scoreFromQr) {
-                return displayResult(false, 'Verification Failed: Malformed signature.');
-            }
-
             try {
+                // The fetch body is now just the UUID.
                 const response = await fetch(SUPABASE_VERIFY_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -129,14 +90,10 @@
 
                 const data = await response.json();
                 const scoreFromDb = parseFloat(data.score).toFixed(1);
-
-                // FINAL CHECK: Does the score in the QR code match the score in the database?
-                if (scoreFromQr === scoreFromDb) {
-                    const message = `Verified! Belongs to ${data.user_name} with score ${scoreFromDb}/10`;
-                    displayResult(true, message);
-                } else {
-                    displayResult(false, 'Verification Failed: Score mismatch. This report may have been altered.');
-                }
+                
+                // If found, display the data from the database. No comparison needed.
+                const message = `Verified! Belongs to ${data.user_name} with score ${scoreFromDb}/10`;
+                displayResult(true, message);
 
             } catch (error) {
                 console.error("Backend verification error:", error);
@@ -151,5 +108,3 @@
             resultText.className = isVerified ? 'verified' : 'failed';
         }
     </script>
-</body>
-</html>
