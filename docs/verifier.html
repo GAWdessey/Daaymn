@@ -7,8 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Bungee&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    <!-- Include the EXIF Reader library -->
-    <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
     <style>
         :root {
             --gradient-start: #FC00FF;
@@ -18,29 +16,75 @@
             --text-color: #E0E0E0;
             --text-color-dark: #888888;
         }
-        /* ... (The rest of your CSS remains the same as I provided before) ... */
+        /* The CSS is identical to my previous correct response, so it is omitted here for brevity */
+         body { margin: 0; padding: 40px 20px; font-family: 'Inter', sans-serif; background-color: var(--background-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; } .main-container { max-width: 700px; width: 100%; text-align: center; } .header h1 { font-family: 'Bungee', cursive; font-size: 56px; font-weight: 900; color: #fff; margin: 0; line-height: 1.2; } .header .daaymn-style { font-family: 'Pacifico', cursive; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 15px rgba(252, 0, 255, 0.5); } .header p { font-size: 18px; color: var(--text-color-dark); max-width: 600px; margin: 15px auto 40px; } .verifier-card { background-color: var(--card-color); padding: 40px; border-radius: 15px; border: 1px solid #222; } #drop-zone { border: 2px dashed var(--text-color-dark); border-radius: 10px; padding: 60px 20px; cursor: pointer; transition: background-color 0.3s, border-color 0.3s; } #drop-zone.drag-over { background-color: #222; border-color: var(--gradient-end); } #drop-zone p { margin: 0; font-size: 18px; color: var(--text-color-dark); } #file-input { display: none; } #scanner-container { padding: 20px 0; } #status-text { font-size: 18px; color: var(--text-color-dark); margin-bottom: 20px; height: 25px; } .progress-bar-container { width: 100%; height: 20px; background-color: #2a2a2a; border-radius: 10px; overflow: hidden; } #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); border-radius: 10px; transition: width 0.2s ease-out; } #result-container { margin-top: 20px; } #result-text { font-family: 'Bungee', cursive; font-size: 48px; margin: 20px 0 0 0; } .verified { background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; } .failed { color: var(--error-color); }
     </style>
 </head>
 <body>
-    <!-- ... (The HTML body remains the same as I provided before) ... -->
+    <div class="main-container">
+        <header class="header">
+            <h1><span class="daaymn-style">Daaymn</span> Score Verifier</h1>
+            <p>Upload a #DaaymnScore Badge or Report Card to instantly verify its authenticity.</p>
+        </header>
+
+        <section class="verifier-card">
+            <div id="drop-zone">
+                <p>Drop image here, or click to select a file</p>
+            </div>
+            <input type="file" id="file-input" accept="image/png">
+
+            <div id="scanner-container" style="display: none;">
+                <p id="status-text">Preparing to scan...</p>
+                <div class="progress-bar-container">
+                    <div id="progress-bar"></div>
+                </div>
+            </div>
+
+            <div id="result-container" style="display: none;">
+                 <p id="result-text"></p>
+            </div>
+        </section>
+    </div>
 
     <script>
-        // ... (The variable declarations remain the same) ...
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const scannerContainer = document.getElementById('scanner-container');
+        const statusText = document.getElementById('status-text');
+        const progressBar = document.getElementById('progress-bar');
+        const resultContainer = document.getElementById('result-container');
+        const resultText = document.getElementById('result-text');
 
+        // Event Listeners
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleFile(e.dataTransfer.files[0]); });
+        
+        // --- Core Logic ---
         function handleFile(file) {
-            // ... (File handling and reader setup is the same) ...
-            
-            // --- UPDATED LOGIC ---
-            // Use EXIF.js to read metadata
-            EXIF.getData(file, function() {
-                const signature = EXIF.getTag(this, "UserComment");
-                
-                // Now, simulate the scan and then verify the extracted signature
-                simulateScan(signature);
-            });
+            if (!file || !file.type.startsWith('image/png')) {
+                alert('Please upload a valid PNG image.');
+                return;
+            }
+            // Reset UI
+            dropZone.style.display = 'none';
+            resultContainer.style.display = 'none';
+            scannerContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            statusText.textContent = 'Initializing scanner...';
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => simulateScan(img);
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
-        function simulateScan(signature) {
+        function simulateScan(image) {
             let progress = 0;
             statusText.textContent = 'Scanning image data...';
             
@@ -51,21 +95,59 @@
 
                 if (progress >= 100) {
                     clearInterval(interval);
-                    statusText.textContent = 'Verifying signature with Daaymn servers...';
-                    // After the animation, run the actual check on the extracted signature
-                    setTimeout(() => checkSignatureWithBackend(signature), 500);
+                    statusText.textContent = 'Extracting signature from pixels...';
+                    setTimeout(() => extractAndVerifySignature(image), 300);
                 }
             }, 200);
         }
 
-        async function checkSignatureWithBackend(signature) {
-            if (!signature) {
-                displayResult(false, "Verification Failed: No signature found.");
-                return;
-            }
+        function extractAndVerifySignature(image) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            canvas.width = image.width;
+            canvas.height = image.height;
+            ctx.drawImage(image, 0, 0);
 
-            // --- BACKEND ACTION (Coming in Part 3) ---
-            // In a real implementation, you would make an API call here.
+            try {
+                const signatureBytes = [];
+                let endMarkerFound = false;
+
+                // Scan pixels from bottom-right backwards
+                for (let i = 0; i < canvas.width; i++) {
+                    const x = canvas.width - 1 - i;
+                    const y = canvas.height - 1;
+                    const pixelData = ctx.getImageData(x, y, 1, 1).data;
+                    const alphaValue = pixelData[3];
+
+                    if (alphaValue === 3) { // End of Text marker
+                        endMarkerFound = true;
+                        continue;
+                    }
+                    if (endMarkerFound) {
+                        if (alphaValue === 2) { // Start of Text marker
+                            break; // We're done
+                        }
+                        signatureBytes.push(alphaValue);
+                    }
+                }
+                
+                if (signatureBytes.length > 0) {
+                    const signature = String.fromCharCode(...signatureBytes);
+                    // Now, check this signature with your backend
+                    checkSignatureWithBackend(signature);
+                } else {
+                    displayResult(false, "Verification Failed: No signature found.");
+                }
+
+            } catch (e) {
+                displayResult(false, 'Error: Could not scan image.');
+            }
+        }
+        
+        async function checkSignatureWithBackend(signature) {
+             statusText.textContent = 'Verifying signature with Daaymn servers...';
+
+            // This is where you call your real Supabase function
             // const response = await fetch('YOUR_SUPABASE_FUNCTION_URL/check-signature', {
             //   method: 'POST',
             //   headers: { 'Content-Type': 'application/json' },
@@ -73,14 +155,23 @@
             // });
             // const { isVerified } = await response.json();
             
-            // For now, we'll simulate a successful verification if a signature exists.
-            const isVerified = (signature.includes('@')); 
+            // For now, we simulate success if the signature has the correct format
+            const isVerified = signature && signature.includes('@');
             
-            displayResult(isVerified);
+            // Add a small delay to simulate the network call
+            setTimeout(() => displayResult(isVerified), 800);
         }
-        
+
         function displayResult(isVerified, message) {
-            // ... (This function remains the same as I provided before) ...
+            scannerContainer.style.display = 'none';
+            resultContainer.style.display = 'block';
+            if (isVerified) {
+                resultText.textContent = '100% Daaymn Verified!';
+                resultText.className = 'verified';
+            } else {
+                resultText.textContent = message || 'Verification Failed';
+                resultText.className = 'failed';
+            }
         }
     </script>
 </body>
