@@ -257,7 +257,7 @@
             let extractedBits = [];
             for (let i = 0; i < imageData.data.length; i += 4) {
                 // Only read from pixels that are substantially visible
-                if (imageData.data[i + 3] > 200) {
+                if (imageData.data[i + 3] > 0) {
                     // Extract the least significant bit from the blue channel
                     const lsb = imageData.data[i + 2] & 1;
                     extractedBits.push(lsb);
