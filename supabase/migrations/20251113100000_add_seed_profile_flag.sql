@@ -1,0 +1,2 @@
+ALTER TABLE public.profiles
+ADD COLUMN is_seed_profile BOOLEAN NOT NULL DEFAULT FALSE;

@@ -1,0 +1,84 @@
+
+[functions.new-like]
+enabled = true
+verify_jwt = true
+import_map = "./functions/new-like/deno.json"
+entrypoint = "./functions/new-like/index.ts"
+
+[functions.new-message]
+enabled = true
+verify_jwt = true
+import_map = "./functions/new-message/deno.json"
+entrypoint = "./functions/new-message/index.ts"
+
+[functions.new-match]
+enabled = true
+verify_jwt = true
+import_map = "./functions/new-match/deno.json"
+entrypoint = "./functions/new-match/index.ts"
+
+[functions.cast-vote]
+enabled = true
+verify_jwt = true
+import_map = "./functions/cast-vote/deno.json"
+entrypoint = "./functions/cast-vote/index.ts"
+
+[functions.activate-temporary-infinite-scroll]
+enabled = true
+verify_jwt = true
+import_map = "./functions/activate-temporary-infinite-scroll/deno.json"
+entrypoint = "./functions/activate-temporary-infinite-scroll/index.ts"
+
+[functions.activate-temporary-ghost-mode]
+enabled = true
+verify_jwt = true
+import_map = "./functions/activate-temporary-ghost-mode/deno.json"
+entrypoint = "./functions/activate-temporary-ghost-mode/index.ts"
+
+[functions.claim-free-like]
+enabled = true
+verify_jwt = true
+import_map = "./functions/claim-free-like/deno.json"
+entrypoint = "./functions/claim-free-like/index.ts"
+
+[functions.unlock-feature]
+enabled = true
+verify_jwt = true
+import_map = "./functions/unlock-feature/deno.json"
+entrypoint = "./functions/unlock-feature/index.ts"
+
+[functions.verify-google-purchase]
+enabled = true
+verify_jwt = false
+import_map = "./functions/verify-google-purchase/deno.json"
+entrypoint = "./functions/verify-google-purchase/index.ts"
+
+[functions.grant-report-credit]
+enabled = true
+verify_jwt = true
+import_map = "./functions/grant-report-credit/deno.json"
+entrypoint = "./functions/grant-report-credit/index.ts"
+
+[functions.claim-monthly-report]
+enabled = true
+verify_jwt = true
+import_map = "./functions/claim-monthly-report/deno.json"
+entrypoint = "./functions/claim-monthly-report/index.ts"
+
+[functions.save-signature]
+enabled = true
+verify_jwt = true
+import_map = "./functions/save-signature/deno.json"
+entrypoint = "./functions/save-signature/index.ts"
+
+[functions.check-signature]
+enabled = true
+verify_jwt = true
+import_map = "./functions/check-signature/deno.json"
+entrypoint = "./functions/check-signature/index.ts"
+
+[functions.handle-google-rtdn]
+enabled = true
+verify_jwt = false
+import_map = "./functions/handle-google-rtdn/deno.json"
+entrypoint = "./functions/handle-google-rtdn/index.ts"

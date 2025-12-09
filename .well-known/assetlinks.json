@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.daaymn.daaymn",
+      "sha256_cert_fingerprints": [
+        "DB:BA:1C:78:3B:92:F7:2B:05:53:B7:88:A3:AB:78:12:D3:FA:B9:50:7F:9D:DC:BA:24:00:BD:D1:CA:90:17:71"
+      ]
+    }
+  }
+]

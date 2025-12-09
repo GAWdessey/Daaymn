@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@900&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #121212; }
+        .post-container {
+            width: 1080px;
+            height: 1080px;
+            background-color: #000000;
+            padding: 80px;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .text-content h2 {
+            font-size: 110px;
+            font-weight: 900;
+            color: #fff;
+            margin: 0 0 50px 0;
+            line-height: 1.0;
+        }
+        .text-content h2 span {
+            font-family: 'Pacifico', cursive;
+            color: #FC00FF;
+            text-shadow: 0 0 20px rgba(252, 0, 255, 0.7);
+        }
+        .image-content {
+            width: 60%;
+        }
+        .image-content img {
+            width: 50%;
+            border-radius: 40px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+        }
+        .footer {
+            width: calc(100% - 160px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: absolute;
+            bottom: 80px;
+            left: 80px;
+        }
+        .disclaimer { font-size: 18px; color: #555; text-align: left; }
+        .google-play { height: 60px; }
+    </style>
+</head>
+<body>
+    <div class="post-container">
+        <div class="text-content">
+            <h2>Change the<br><span>Rules.</span></h2>
+        </div>
+        <div class="image-content">
+            <img src="screenshot-unlocks.png" alt="Daaymn App Store - Unlock Tab">
+        </div>
+        <div class="footer">
+            <p class="disclaimer">Coming Soon. Pricing is subject to change.</p>
+            <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" class="google-play">
+        </div>
+    </div>
+</body>
+</html>

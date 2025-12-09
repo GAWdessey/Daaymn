@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@900&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #121212; }
+        .post-container { width: 1080px; height: 1350px; background-color: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px; box-sizing: border-box; font-family: 'Inter', sans-serif; position: relative; overflow: hidden; text-align: center; }
+        .post-container h2 { font-size: 110px; font-weight: 900; color: #fff; margin: 0 0 50px 0; z-index: 2; }
+        .post-container h2 span { font-family: 'Pacifico', cursive; color: #FC00FF; text-shadow: 0 0 20px rgba(252, 0, 255, 0.8); }
+        .post-container .screenshot { position: absolute; bottom: -15%; width: 55%; border-radius: 40px; transform: rotate(5deg); opacity: 0.8; z-index: 1; }
+        .footer { width: calc(100% - 160px); display: flex; justify-content: space-between; align-items: center; position: absolute; bottom: 80px; left: 80px; z-index: 3;}
+        .disclaimer { font-size: 18px; color: #555; }
+        .google-play { height: 60px; }
+    </style>
+</head>
+<body>
+    <div class="post-container">
+        <h2>See Everyone.<br>Miss <span>Nothing.</span></h2>
+        <img src="screenshot-infinity-scroll.png" alt="Daaymn App Infinity Scroll Freebie" class="screenshot">
+        <div class="footer">
+            <p class="disclaimer">Coming Soon. Pricing subject to change.</p>
+            <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" class="google-play">
+        </div>
+    </div>
+</body>
+</html>

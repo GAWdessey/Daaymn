@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@900&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #121212; }
+        .post-container { width: 1080px; height: 1080px; background-color: #000000; padding: 80px; box-sizing: border-box; font-family: 'Inter', sans-serif; position: relative; overflow: hidden; }
+        .text-content { position: absolute; z-index: 10; top: 100px; left: 80px; text-align: left; }
+        .text-content h2 { font-size: 110px; font-weight: 900; color: #fff; margin: 0; line-height: 1.2; }
+        .text-content h2 span { font-family: 'Pacifico', cursive; color: #FC00FF; text-shadow: 0 0 20px rgba(252, 0, 255, 0.7); }
+        .image-container { position: absolute; width: 100%; height: 100%; top: 0; left: 0; }
+        .sub-card { position: absolute; width: 40%; border-radius: 20px; box-shadow: -10px 10px 40px rgba(0, 0, 0, 0.5); }
+        #standard-sub { z-index: 1; bottom: 17%; left: 15%; transform: rotate(-15deg); }
+        #pro-sub { z-index: 2; bottom: 20%; right: 15%; transform: rotate(15deg); }
+        #deluxe-sub { z-index: 3; bottom: 24%; left: 50%; transform: translateX(-50%) rotate(0deg); width: 42%; }
+        .footer { width: calc(100% - 160px); display: flex; justify-content: space-between; align-items: center; position: absolute; bottom: 80px; left: 80px; }
+        .disclaimer { font-size: 18px; color: #555; text-align: left; }
+        .google-play { height: 60px; }
+    </style>
+</head>
+<body>
+    <div class="post-container">
+        <div class="text-content">
+            <h2>Become<br><span>Legendary.</span></h2>
+        </div>
+        <div class="image-container">
+            <img src="sub-standard.png" alt="Standard Daaymn Subscription" class="sub-card" id="standard-sub">
+            <img src="sub-pro.png" alt="Pro Daaymn Subscription" class="sub-card" id="pro-sub">
+            <img src="sub-deluxe.png" alt="Deluxe Daaymn Subscription" class="sub-card" id="deluxe-sub">
+        </div>
+        <div class="footer">
+            <p class="disclaimer">Coming Soon. Pricing is subject to change.</p>
+            <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" class="google-play">
+        </div>
+    </div>
+</body>
+</html>

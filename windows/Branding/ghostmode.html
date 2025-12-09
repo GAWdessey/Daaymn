@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #121212;
+        }
+
+        .post-container {
+            width: 1080px;
+            height: 1080px;
+            background-color: #000000;
+            padding: 80px;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-panel {
+            flex-basis: 50%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 5; /* Ensure text is above any overlap */
+        }
+
+        .text-content h2 {
+            font-size: 110px;
+            font-weight: 900;
+            color: #fff;
+            margin: 0;
+            line-height: 1.2;
+            text-align: left;
+        }
+
+        .text-content h2 span {
+            font-family: 'Pacifico', cursive;
+            color: #FC00FF;
+            text-shadow: 0 0 20px rgba(252, 0, 255, 0.9);
+        }
+
+        .image-panel {
+            flex-basis: 50%;
+            height: 1000%;
+            position: relative; /* Needed to position the screenshot and SVG */
+        }
+
+        .image-panel .screenshot {
+            position: absolute;
+            width: 120%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(8deg);
+            max-width: none;
+            border-radius: 40px;
+        }
+        
+        .arrow-svg {
+            position: absolute;
+            top: 10;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Allows clicks to go through the SVG */
+            z-index: 100;
+            overflow: visible; /* Prevents arrowhead from being clipped */
+        }
+
+        .arrow-path {
+            stroke: #FC00FF;
+            stroke-width: 6;
+            fill: none;
+            filter: drop-shadow(0 0 10px rgba(252, 0, 255, 0.8));
+        }
+        
+        .footer {
+            width: calc(100% - 160px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: absolute;
+            bottom: 80px;
+            left: 80px;
+        }
+
+        .disclaimer {
+            font-size: 18px;
+            color: #555;
+            text-align: left;
+        }
+
+        .google-play {
+            height: 60px;
+        }
+    </style>
+</head>
+<body>
+    <div class="post-container">
+        <div class="left-panel">
+            <div class="text-content">
+                <h2>Browse<br>in <span>Stealth.</span></h2>
+            </div>
+        </div>
+
+        <div class="image-panel">
+            <img src="screenshot-ghost-mode.png" alt="Daaymn App Settings - Ghost Mode" class="screenshot">
+            
+            <!-- SVG for the curved, glowing arrow -->
+            <svg class="arrow-svg" viewBox="0 0 500 920">
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#FC00FF" />
+                    </marker>
+                </defs>
+                <!-- This path creates the half-moon curve -->
+                <path class="arrow-path" d="M -200 250 Q 150 50 450 250" marker-end="url(#arrowhead)"></path>
+            </svg>
+        </div>
+
+        <div class="footer">
+            <p class="disclaimer">Coming Soon. Features are unlocked monthly.</p>
+            <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" class="google-play">
+        </div>
+    </div>
+</body>
+</html>
