@@ -42,3 +42,6 @@ service-account.json
 /ios/Flutter/flutter_assets/kernel_blob.bin
 /ios/Flutter/flutter_assets/app.flx
 
+
+# Secrets - never commit
+.env
