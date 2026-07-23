@@ -1443,6 +1443,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
                             borderRadius: BorderRadius.circular(12.0),
                             child: Image.network(
                               _userProfile!.imageUrl ?? '',
+                              cacheWidth: 1080,
                               fit: BoxFit.cover,
                               height: double.infinity,
                               errorBuilder: (context, error, stackTrace) =>

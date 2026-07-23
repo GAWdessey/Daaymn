@@ -319,6 +319,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               child: (user.imageUrl != null && user.imageUrl!.isNotEmpty) 
                 ? CachedNetworkImage(
                     imageUrl: user.imageUrl!,
+                    memCacheWidth: 180,
                     fit: BoxFit.cover,
                     width: 56,
                     height: 56,

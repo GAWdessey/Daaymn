@@ -394,6 +394,7 @@ class _YourLikesScreenState extends State<YourLikesScreen> {
                           child: (likedProfile.profile.imageUrl != null && likedProfile.profile.imageUrl!.isNotEmpty)
                             ? CachedNetworkImage(
                                 imageUrl: likedProfile.profile.imageUrl!,
+                                memCacheWidth: 180,
                                 fit: BoxFit.cover,
                                 width: 56,
                                 height: 56,

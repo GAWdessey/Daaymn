@@ -48,6 +48,7 @@ class ProfileCard extends StatelessWidget {
                 child: (profile.imageUrl != null && profile.imageUrl!.isNotEmpty)
                     ? CachedNetworkImage(
                         imageUrl: profile.imageUrl!,
+                        memCacheWidth: 1080,
                         fit: BoxFit.cover,
                         placeholder: (context, url) => Container(color: Colors.grey[800]),
                         errorWidget: (context, url, error) => Container(

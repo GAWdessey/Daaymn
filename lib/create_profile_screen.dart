@@ -542,6 +542,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     } else if (source is String) {
       imageContent = Image.network(
         source,
+        cacheWidth: 720,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, size: 24, color: Colors.grey),
       );
@@ -602,6 +603,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     } else if (source is String) {
       imageContent = Image.network(
         source,
+        cacheWidth: 720,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) =>
             const Icon(Icons.broken_image, size: 48, color: Colors.white70),

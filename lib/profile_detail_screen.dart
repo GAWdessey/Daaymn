@@ -348,6 +348,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> with TickerPr
           borderRadius: BorderRadius.circular(12.0),
           child: CachedNetworkImage(
             imageUrl: imageUrl,
+            memCacheWidth: 1080,
             fit: BoxFit.cover,
             width: double.infinity,
             height: MediaQuery.of(context).size.height * 0.6,
@@ -373,6 +374,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> with TickerPr
               borderRadius: BorderRadius.circular(12.0),
               child: CachedNetworkImage(
                 imageUrl: imageUrl,
+            memCacheWidth: 1080,
                 fit: BoxFit.cover,
                 width: double.infinity,
                 height: MediaQuery.of(context).size.height * 0.6,
