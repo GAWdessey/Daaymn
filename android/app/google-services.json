@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "717879539579",
+    "project_id": "daaymn-notifications",
+    "storage_bucket": "daaymn-notifications.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:717879539579:android:780b4396a0fbfc55112fde",
+        "android_client_info": {
+          "package_name": "com.daaymn.daaymn"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-2QRp3N1EA-lt8Q_DBrgwJCK3PK0rEgI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
