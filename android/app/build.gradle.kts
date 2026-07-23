@@ -58,8 +58,8 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
         debug {
-            // This line enables release signing for debug builds, allowing IAP testing.
-            signingConfig = signingConfigs.getByName("release")
+            // Debug builds use debug signing so they build without the release keystore (e.g. CI).
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
@@ -81,3 +81,4 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
     implementation("androidx.multidex:multidex:2.0.1")
 }
+
