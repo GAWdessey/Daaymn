@@ -15,6 +15,7 @@ import 'package:daaymn/theme_provider.dart';
 import 'package:daaymn/widgets/verified_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:screen_protector/screen_protector.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -99,6 +100,7 @@ Future<void> _initializeServices() async {
       anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
     );
     await PushNotificationService().init();
+    await MobileAds.instance.initialize();
     await serviceLocator.init();
   } catch (e, stackTrace) {
     if (kDebugMode) print('An unexpected error occurred during initialization: $e\n$stackTrace');

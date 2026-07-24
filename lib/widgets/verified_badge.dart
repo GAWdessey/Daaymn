@@ -30,7 +30,7 @@ class VerifiedBadge extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.25),
+          color: Colors.black.withValues(alpha: 0.25),
           borderRadius: BorderRadius.circular(5),
         ),
         child: Row(
@@ -42,7 +42,7 @@ class VerifiedBadge extends StatelessWidget {
             Text(
               'Verified',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
                 fontSize: size * 0.85,
                 fontWeight: FontWeight.bold,
               ),

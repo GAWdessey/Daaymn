@@ -20,10 +20,10 @@ class CommunityPollOption {
 
   factory CommunityPollOption.fromMap(Map<String, dynamic> map) {
     return CommunityPollOption(
-      id: map['id'],
-      title: map['title'],
-      subtitle: map['subtitle'],
-      votes: map['votes'] ?? 0,
+      id: map['id'] as String? ?? '',
+      title: map['title'] as String? ?? 'Untitled',
+      subtitle: map['subtitle'] as String?,
+      votes: (map['votes'] as num?)?.toInt() ?? 0,
     );
   }
 }
@@ -61,7 +61,7 @@ class _PollsScreenState extends State<PollsScreen> {
 
   Future<void> _fetchInitialData() async {
     try {
-      final now = DateTime.now().toIso8601String();
+      final now = DateTime.now().toUtc().toIso8601String();
       final List<dynamic> pollsResponse = await Supabase.instance.client
           .from('polls')
           .select('id')
@@ -88,7 +88,15 @@ class _PollsScreenState extends State<PollsScreen> {
           .map((data) => CommunityPollOption.fromMap(data))
           .toList();
 
-      final userId = Supabase.instance.client.auth.currentUser!.id;
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+      if (userId == null) {
+        if (mounted) {
+          setState(() {
+            _error = 'You must be signed in to view polls.';
+          });
+        }
+        return;
+      }
       final voteResponse = await Supabase.instance.client
           .from('poll_votes')
           .select('option_id')
@@ -108,7 +116,7 @@ class _PollsScreenState extends State<PollsScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = e.toString();
+          _error = "Daaymn, we couldn't load the poll right now. Please try again later.";
         });
       }
     }
@@ -118,20 +126,20 @@ class _PollsScreenState extends State<PollsScreen> {
     if (_activePollId == null) return;
     _pollSubscription = Supabase.instance.client
         .from('poll_options')
-        .stream(primaryKey: ['id']).listen((payload) {
+        .stream(primaryKey: ['id'])
+        .eq('poll_id', _activePollId!)
+        .listen((payload) {
       if (mounted) {
         var optionsHaveChanged = false;
         var newPollOptions = List<CommunityPollOption>.from(_pollOptions);
 
         for (var updatedData in payload) {
-          if (updatedData['poll_id'] == _activePollId) {
-            final updatedOption = CommunityPollOption.fromMap(updatedData);
-            final index = newPollOptions.indexWhere((opt) => opt.id == updatedOption.id);
-            if (index != -1) {
-              if(newPollOptions[index].votes != updatedOption.votes) {
-                newPollOptions[index] = updatedOption;
-                optionsHaveChanged = true;
-              }
+          final updatedOption = CommunityPollOption.fromMap(updatedData);
+          final index = newPollOptions.indexWhere((opt) => opt.id == updatedOption.id);
+          if (index != -1) {
+            if (newPollOptions[index].votes != updatedOption.votes) {
+              newPollOptions[index] = updatedOption;
+              optionsHaveChanged = true;
             }
           }
         }
@@ -151,6 +159,7 @@ class _PollsScreenState extends State<PollsScreen> {
 
     setState(() {
       _userVotedOptionId = selectedOption.id;
+      selectedOption.votes++;
     });
 
     try {
@@ -171,10 +180,11 @@ class _PollsScreenState extends State<PollsScreen> {
       if (mounted) {
         setState(() {
           _userVotedOptionId = null;
+          selectedOption.votes--;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to cast vote: '+e.toString()),
+          const SnackBar(
+            content: Text("Daaymn, we couldn't record your vote. Please try again."),
             backgroundColor: Colors.red,
           ),
         );
@@ -224,8 +234,8 @@ class _PollsScreenState extends State<PollsScreen> {
 
   Future<void> _showLastMonthsWinner() async {
     try {
-      final now = DateTime.now();
-      final firstDayOfCurrentMonth = DateTime(now.year, now.month, 1);
+      final now = DateTime.now().toUtc();
+      final firstDayOfCurrentMonth = DateTime.utc(now.year, now.month, 1);
 
       // Step 1: Find the poll from last month.
       final pollsResponse = await Supabase.instance.client
@@ -259,7 +269,7 @@ class _PollsScreenState extends State<PollsScreen> {
         _showWinnerDialog(winner, totalVotes: totalVotes);
       }
     } catch (e) {
-       _showWinnerDialog(null, error: e.toString());
+       _showWinnerDialog(null, error: "Daaymn, we couldn't load last month's winner. Please try again later.");
     }
   }
 
@@ -467,7 +477,7 @@ class _PollsScreenState extends State<PollsScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: statusColor.withOpacity(0.1),
+        color: statusColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(

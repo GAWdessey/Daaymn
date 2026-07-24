@@ -66,7 +66,7 @@ class ProfileCard extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
+                      colors: [Colors.transparent, Colors.black.withValues(alpha: 0.8)],
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       stops: const [0.5, 1.0],
@@ -153,7 +153,7 @@ class ProfileCard extends StatelessWidget {
                         child: _buildActionButton(
                           icon: Icons.close,
                           color: Colors.white,
-                          backgroundColor: Colors.red.withOpacity(0.9),
+                          backgroundColor: Colors.red.withValues(alpha: 0.9),
                           onPressed: onDislike!,
                         ),
                       ),
@@ -163,7 +163,7 @@ class ProfileCard extends StatelessWidget {
                         child: _buildActionButton(
                           icon: Icons.favorite,
                           color: Colors.white,
-                          backgroundColor: Colors.pinkAccent.withOpacity(0.9),
+                          backgroundColor: Colors.pinkAccent.withValues(alpha: 0.9),
                           onPressed: onLike!,
                         ),
                       ),
@@ -181,7 +181,7 @@ class ProfileCard extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.7),
+                        color: Colors.black.withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: Row(
@@ -208,9 +208,9 @@ class ProfileCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.5), width: 1),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 1),
       ),
       child: Text(
         interest,
@@ -233,7 +233,7 @@ class ProfileCard extends StatelessWidget {
       child: InkWell(
         onTap: onPressed,
         customBorder: const CircleBorder(),
-        splashColor: color.withOpacity(0.3),
+        splashColor: color.withValues(alpha: 0.3),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Icon(icon, color: color, size: 32),

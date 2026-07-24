@@ -37,9 +37,9 @@ class OnlineIndicator extends StatelessWidget {
                 center: const Alignment(-0.4, -0.4),
                 stops: const [0.0, 0.4, 1.0],
                 colors: [
-                  Colors.white.withOpacity(0.6),
-                  Colors.white.withOpacity(0.2),
-                  Colors.white.withOpacity(0.0),
+                  Colors.white.withValues(alpha: 0.6),
+                  Colors.white.withValues(alpha: 0.2),
+                  Colors.white.withValues(alpha: 0.0),
                 ],
               ),
             ),
@@ -51,7 +51,7 @@ class OnlineIndicator extends StatelessWidget {
             size: size * 0.6,
             shadows: [
               Shadow(
-                color: Colors.black.withOpacity(0.4),
+                color: Colors.black.withValues(alpha: 0.4),
                 blurRadius: 2.0,
                 offset: const Offset(0, 1.0),
               )

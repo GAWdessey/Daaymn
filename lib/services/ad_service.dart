@@ -8,9 +8,15 @@ class AdService extends ChangeNotifier {
 
   bool get isAdReady => _isAdReady;
 
-  final String _adUnitId = defaultTargetPlatform == TargetPlatform.android
-      ? 'ca-app-pub-6347197985985593/6834202357' // Android Production ID
-      : 'ca-app-pub-3940256099942544/1712485313'; // iOS Test ID
+  int _retryCount = 0;
+
+  final String _adUnitId = kDebugMode
+      ? (defaultTargetPlatform == TargetPlatform.android
+          ? 'ca-app-pub-3940256099942544/5224354917'
+          : 'ca-app-pub-3940256099942544/1712485313')
+      : (defaultTargetPlatform == TargetPlatform.android
+          ? 'ca-app-pub-6347197985985593/6834202357'
+          : 'ca-app-pub-3940256099942544/1712485313'); // TODO: real iOS rewarded unit id
 
   void loadRewardedAd() {
     if (_isAdReady) return;
@@ -23,12 +29,17 @@ class AdService extends ChangeNotifier {
           debugPrint('Rewarded ad loaded.');
           _rewardedAd = ad;
           _isAdReady = true;
+          _retryCount = 0;
           notifyListeners();
         },
         onAdFailedToLoad: (LoadAdError error) {
           debugPrint('Rewarded ad failed to load: $error');
           _isAdReady = false;
           notifyListeners();
+          if (_retryCount < 3) {
+            _retryCount++;
+            Future.delayed(Duration(seconds: 2 * _retryCount), loadRewardedAd);
+          }
         },
       ),
     );

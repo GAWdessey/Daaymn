@@ -562,7 +562,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ? const Text('You\'re an official, real person!')
                                 : RichText(
                                     text: TextSpan(
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7)),
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7)),
                                       children: const <TextSpan>[
                                         TextSpan(text: 'Get your '),
                                         TextSpan(text: 'Daaymn', style: TextStyle(fontFamily: 'Pacifico')),

@@ -632,12 +632,12 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.pinkAccent.withOpacity(0.5),
+                color: Colors.pinkAccent.withValues(alpha: 0.5),
                 blurRadius: 15,
                 spreadRadius: 2,
               ),
               BoxShadow(
-                color: Colors.cyanAccent.withOpacity(0.5),
+                color: Colors.cyanAccent.withValues(alpha: 0.5),
                 blurRadius: 15,
                 spreadRadius: -2,
               ),
@@ -651,9 +651,9 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.black.withOpacity(0.8),
+                      Colors.black.withValues(alpha: 0.8),
                       Colors.transparent,
-                      Colors.black.withOpacity(0.8)
+                      Colors.black.withValues(alpha: 0.8)
                     ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -667,7 +667,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Row(

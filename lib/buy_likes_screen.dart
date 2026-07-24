@@ -116,7 +116,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
                   height: 40.0, // *** SMALLER SIZE ***
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withValues(alpha: 0.6),
                   ),
                   child: QrImageView(
                     data: _verificationId!,
@@ -207,7 +207,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
         Text(
           'SCORE BREAKDOWN',
           style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               letterSpacing: 1,
               fontWeight: FontWeight.bold),
         ),
@@ -578,7 +578,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
 
     return Card(
       elevation: 8,
-      color: Colors.black.withOpacity(0.4),
+      color: Colors.black.withValues(alpha: 0.4),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       clipBehavior: Clip.antiAlias,
       child: Padding(
@@ -690,7 +690,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
       children: [
         Text(
           'DEEP DIVE STATISTICS',
-          style: TextStyle(color: Colors.white.withOpacity(0.8), letterSpacing: 1, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.8), letterSpacing: 1, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 16),
         Wrap(
@@ -737,7 +737,15 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
             body: {'rewardType': rewardType},
           );
         } catch (e) {
-          // Error handling
+          debugPrint('claim reward failed: $e');
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Daaymn, we couldn't apply your reward. Please try again."),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
         }
       },
       onAdDismissed: () {
@@ -768,7 +776,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
       return Card(
         elevation: 8, margin: const EdgeInsets.symmetric(vertical: 8.0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: BorderSide(color: Colors.blueAccent[100]!, width: 2)),
-        clipBehavior: Clip.antiAlias, color: Colors.black.withOpacity(0.3),
+        clipBehavior: Clip.antiAlias, color: Colors.black.withValues(alpha: 0.3),
         child: InkWell(
           onTap: _claimFreeMonthlyReport,
           child: Padding(
@@ -793,7 +801,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
       return Card(
         elevation: 8, margin: const EdgeInsets.symmetric(vertical: 8.0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: BorderSide(color: Colors.grey[700]!, width: 2)),
-        clipBehavior: Clip.antiAlias, color: Colors.black.withOpacity(0.3),
+        clipBehavior: Clip.antiAlias, color: Colors.black.withValues(alpha: 0.3),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
@@ -1297,14 +1305,14 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
         children: [
           Row(
             children: [
-              Icon(icon, color: textColor.withOpacity(0.8), size: 16),
+              Icon(icon, color: textColor.withValues(alpha: 0.8), size: 16),
               const SizedBox(width: 8),
               Text(
                 label,
                 style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: textColor.withOpacity(0.8)),
+                    color: textColor.withValues(alpha: 0.8)),
               ),
             ],
           ),
@@ -1325,7 +1333,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
   Widget _buildCvCategoryScore({required String title, required double score, String? grade, required Color textColor}) {
   return Column(
   children: [
-  Text(title, style: TextStyle(color: textColor.withOpacity(0.8), fontSize: 12)),
+  Text(title, style: TextStyle(color: textColor.withValues(alpha: 0.8), fontSize: 12)),
   const SizedBox(height: 8),
   Wrap(
   crossAxisAlignment: WrapCrossAlignment.center,
@@ -1336,7 +1344,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
   score.toStringAsFixed(1),
   style: TextStyle(color: textColor, fontSize: 20, fontWeight: FontWeight.bold),
   ),
-  Text('/10', style: TextStyle(color: textColor.withOpacity(0.6), fontSize: 10)),
+  Text('/10', style: TextStyle(color: textColor.withValues(alpha: 0.6), fontSize: 10)),
   if (grade != null) Text('($grade)', style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.bold)),
   ],
   ),
@@ -1351,7 +1359,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
   children: [
   Text(
   'DAAYMN SCORE',
-  style: TextStyle(color: textColor.withOpacity(0.8), fontSize: 12, fontWeight: FontWeight.bold),
+  style: TextStyle(color: textColor.withValues(alpha: 0.8), fontSize: 12, fontWeight: FontWeight.bold),
   ),
   const SizedBox(height: 8),
   Text(
@@ -1422,9 +1430,9 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
       child: Container(
         width: 400,
         decoration: BoxDecoration(
-          color: _selectedCardColor.withOpacity(0.7),
+          color: _selectedCardColor.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.2)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
         ),
         child: Stack(
           children: [
@@ -1448,10 +1456,10 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
                               height: double.infinity,
                               errorBuilder: (context, error, stackTrace) =>
                                   Container(
-                                    color: Colors.black.withOpacity(0.2),
+                                    color: Colors.black.withValues(alpha: 0.2),
                                     child: Icon(Icons.person,
                                         size: 60,
-                                        color: textColor.withOpacity(0.5)),
+                                        color: textColor.withValues(alpha: 0.5)),
                                   ),
                             ),
                           ),
@@ -1460,7 +1468,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 24.0),
                         child: VerticalDivider(
-                            width: 1, color: textColor.withOpacity(0.2)),
+                            width: 1, color: textColor.withValues(alpha: 0.2)),
                       ),
                       Expanded(child: _buildCvScore(textColor)),
                     ],
@@ -1475,7 +1483,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
                           child: Container(
                               width: 80,
                               height: 1,
-                              color: textColor.withOpacity(0.2),
+                              color: textColor.withValues(alpha: 0.2),
                               margin:
                               const EdgeInsets.symmetric(vertical: 12))),
                       Text(_userProfile!.name,
@@ -1493,7 +1501,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
                           child: Container(
                               width: 80,
                               height: 1,
-                              color: textColor.withOpacity(0.2),
+                              color: textColor.withValues(alpha: 0.2),
                               margin:
                               const EdgeInsets.symmetric(vertical: 16))),
                       Row(
@@ -1537,7 +1545,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
                   height: 40.0, // *** SMALLER SIZE ***
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withValues(alpha: 0.6),
                   ),
                   child: QrImageView(
                     data: _verificationId!,
@@ -1816,7 +1824,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       clipBehavior: Clip.antiAlias,
-      color: Colors.black.withOpacity(0.2),
+      color: Colors.black.withValues(alpha: 0.2),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -1910,7 +1918,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       clipBehavior: Clip.antiAlias,
-      color: Colors.black.withOpacity(0.2),
+      color: Colors.black.withValues(alpha: 0.2),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -2068,7 +2076,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
                 borderRadius: BorderRadius.circular(15)
             ),
             clipBehavior: Clip.antiAlias,
-            color: Colors.black.withOpacity(isSubscribedToThisTier
+            color: Colors.black.withValues(alpha: isSubscribedToThisTier
                 ? 0.4 // Highlight for the active subscription
                 : isPopular && canPurchase
                 ? 0.4
@@ -2250,7 +2258,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
           margin: const EdgeInsets.symmetric(vertical: 8.0),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           clipBehavior: Clip.antiAlias,
-          color: Colors.black.withOpacity(isPopular ? 0.4 : 0.2),
+          color: Colors.black.withValues(alpha: isPopular ? 0.4 : 0.2),
           child: InkWell(
             onTap: () {
               if (isPromoClaimable) {
@@ -2521,7 +2529,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
           margin: const EdgeInsets.symmetric(vertical: 8.0),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           clipBehavior: Clip.antiAlias,
-          color: Colors.black.withOpacity(0.2),
+          color: Colors.black.withValues(alpha: 0.2),
           child: InkWell(
             onTap: () {
               if (isClaimable) {

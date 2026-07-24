@@ -226,8 +226,8 @@ class _AuthScreenState extends State<AuthScreen> {
                 if (themeProvider.isDaaymnbow)
                   Card(
                     elevation: 4.0,
-                    shadowColor: Colors.black.withOpacity(0.5),
-                    color: Colors.white.withOpacity(0.85),
+                    shadowColor: Colors.black.withValues(alpha: 0.5),
+                    color: Colors.white.withValues(alpha: 0.85),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

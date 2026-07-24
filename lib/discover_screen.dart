@@ -683,7 +683,7 @@ class _PaywallCard extends StatelessWidget {
                 const SizedBox(height: 24),
                 Text(
                   'Daaymn!',
-                  style: TextStyle(fontFamily: 'Pacifico', fontSize: 40, color: Colors.white.withOpacity(0.9)),
+                  style: TextStyle(fontFamily: 'Pacifico', fontSize: 40, color: Colors.white.withValues(alpha: 0.9)),
                 ),
                 const SizedBox(height: 16),
                 Text(

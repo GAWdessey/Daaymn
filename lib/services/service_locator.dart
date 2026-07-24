@@ -37,9 +37,9 @@ class ServiceLocator {
       getIt.registerLazySingleton<ProfileProvider>(() => ProfileProvider());
       getIt.registerLazySingleton<PromoCodeService>(() => PromoCodeService());
 
-      getIt.registerSingleton<AdService>(AdService(), instanceName: 'like');
-      getIt.registerSingleton<AdService>(AdService(), instanceName: 'scroll');
-      getIt.registerSingleton<AdService>(AdService(), instanceName: 'ghost');
+      getIt.registerSingleton<AdService>(AdService(), instanceName: 'like', dispose: (s) => s.dispose());
+      getIt.registerSingleton<AdService>(AdService(), instanceName: 'scroll', dispose: (s) => s.dispose());
+      getIt.registerSingleton<AdService>(AdService(), instanceName: 'ghost', dispose: (s) => s.dispose());
 
       _preloadRewardedAds();
 
