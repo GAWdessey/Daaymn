@@ -53,7 +53,8 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
 
       // 2) Email the report to daaymnco@gmail.com via FormSubmit.
       await http.post(
-        Uri.parse('https://formsubmit.co/ajax/daaymnco@gmail.com'),
+        // Hashed FormSubmit endpoint (keeps the raw email out of the APK).
+        Uri.parse('https://formsubmit.co/ajax/190d0d827fc650b20e6ada5c0a9cb9c1'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
