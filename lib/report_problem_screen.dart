@@ -57,6 +57,10 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          // FormSubmit rejects requests with no web origin; native clients
+          // send none, so present the app's site as origin/referer.
+          'Origin': 'https://daaymn.co',
+          'Referer': 'https://daaymn.co/',
         },
         body: jsonEncode({
           'subject': 'Daaymn problem report',
