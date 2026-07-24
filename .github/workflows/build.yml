@@ -6,7 +6,7 @@ on:
 jobs:
   android:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -19,6 +19,25 @@ jobs:
       - run: flutter --version
       - run: flutter pub get
       - run: flutter analyze --no-fatal-infos --no-fatal-warnings || true
+      # ---- release signing from repo secrets ----
+      - name: Decode upload keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/upload.jks
+      - name: Write key.properties
+        run: |
+          {
+            echo "storeFile=upload.jks"
+            echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}"
+            echo "keyPassword=${{ secrets.KEY_PASSWORD }}"
+            echo "keyAlias=${{ secrets.KEY_ALIAS }}"
+          } > android/key.properties
+      - name: Build signed release AAB
+        run: flutter build appbundle --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: daaymn-release-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+      # keep a debug APK too (handy for side-load testing)
       - run: flutter build apk --debug
       - uses: actions/upload-artifact@v4
         with:
