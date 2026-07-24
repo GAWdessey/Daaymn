@@ -1,21 +1,21 @@
--- ============ Rolling monthly community polls ============
--- Winner (>10 votes) is archived + replaced by next pool item; losers carry over.
+-- ================= Rolling monthly community polls =================
+-- Removes auto-generated placeholder junk, stands up one clean current
+-- poll from a pool of real improvements, and installs a monthly roll:
+-- top option WINS only if >10 votes -> archived + replaced by next pool
+-- item; losers carry over (votes reset). If top<=10, nothing moves.
 
+-- 0. Remove placeholder junk polls (auto-generated, zero real votes)
+delete from public.poll_options
+  where poll_id in (select id from public.polls where title like 'Future Poll Month %');
+delete from public.polls where title like 'Future Poll Month %';
+
+-- 1. Pool of real improvements (drawn one at a time to replace winners)
 create table if not exists public.poll_option_pool (
   id uuid primary key default gen_random_uuid(),
   title text not null,
   subtitle text not null,
   position int not null,
   used_at timestamptz
-);
-
-create table if not exists public.poll_winners (
-  id uuid primary key default gen_random_uuid(),
-  poll_id uuid,
-  title text,
-  subtitle text,
-  votes int,
-  won_at timestamptz default now()
 );
 
 insert into public.poll_option_pool (title, subtitle, position)
@@ -65,6 +65,17 @@ select v.title, v.subtitle, v.position from (values
 ) as v(title, subtitle, position)
 where not exists (select 1 from public.poll_option_pool);
 
+-- 2. Winners archive
+create table if not exists public.poll_winners (
+  id uuid primary key default gen_random_uuid(),
+  poll_id uuid,
+  title text,
+  subtitle text,
+  votes int,
+  won_at timestamptz default now()
+);
+
+-- 3. Monthly roll: winner (>10 votes) archived + replaced; losers carry over
 create or replace function public.roll_monthly_poll() returns void
 language plpgsql security definer set search_path = public as $fn$
 declare
@@ -76,7 +87,7 @@ declare
   mon_end   timestamptz := date_trunc('month', now()) + interval '1 month' - interval '1 second';
 begin
   if exists (select 1 from public.polls where start_date = mon_start) then
-    return;  -- current month's poll already exists
+    return;  -- this month's poll already exists
   end if;
 
   select * into ended_poll from public.polls where end_date < now() order by end_date desc limit 1;
@@ -113,12 +124,27 @@ begin
 end;
 $fn$;
 
-select public.roll_monthly_poll();  -- bootstrap: create this month's poll now
+-- 4. Bootstrap THIS month's clean poll with 3 fresh improvements
+do $boot$
+declare np uuid := gen_random_uuid(); it record;
+begin
+  if not exists (select 1 from public.polls where start_date = date_trunc('month', now())) then
+    insert into public.polls (id, title, start_date, end_date)
+    values (np, to_char(now(),'FMMonth YYYY')||' Community Poll',
+            date_trunc('month',now()), date_trunc('month',now())+interval '1 month'-interval '1 second');
+    for it in select * from public.poll_option_pool where used_at is null order by position limit 3 loop
+      insert into public.poll_options (poll_id, title, subtitle, votes) values (np, it.title, it.subtitle, 0);
+      update public.poll_option_pool set used_at = now() where id = it.id;
+    end loop;
+  end if;
+end $boot$;
 
+-- 5. Schedule monthly roll (idempotent)
 create extension if not exists pg_cron;
+select cron.unschedule('roll-monthly-poll') where exists (select 1 from cron.job where jobname='roll-monthly-poll');
 select cron.schedule('roll-monthly-poll', '5 0 1 * *', $cron$select public.roll_monthly_poll();$cron$);
 
--- ============ Problem reports (Report-a-Problem feature) ============
+-- 6. Problem reports (Report-a-Problem feature)
 create table if not exists public.problem_reports (
   id uuid primary key default gen_random_uuid(),
   user_id uuid,
