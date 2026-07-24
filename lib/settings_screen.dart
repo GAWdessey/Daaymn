@@ -14,7 +14,6 @@ import 'package:daaymn/utils/face_verification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
-import 'package:screen_protector/screen_protector.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
@@ -52,9 +51,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _reportProblemKey = GlobalKey();
   final _ghostModeKey = GlobalKey();
 
-  bool _isScreenCaptureOn = false;
-  final _passwordController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
@@ -65,7 +61,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
@@ -442,67 +437,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Future<void> _showPasswordDialog() async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Enter Password'),
-          content: TextField(
-            controller: _passwordController,
-            obscureText: true,
-            decoration: const InputDecoration(hintText: "Password"),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                _passwordController.clear();
-              },
-            ),
-            TextButton(
-              child: const Text('Submit'),
-              onPressed: () {
-                if (_passwordController.text == 'Wh1sk3y') {
-                  setState(() {
-                    _isScreenCaptureOn = true;
-                  });
-                  ScreenProtector.preventScreenshotOff();
-                  Navigator.of(context).pop();
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Incorrect password')),
-                  );
-                }
-                _passwordController.clear();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildScreenCaptureTile() {
-    return SwitchListTile(
-      title: const Text('Expose (Screen Capture)'),
-      subtitle: const Text('Allows screen recording and screenshots when enabled.'),
-      value: _isScreenCaptureOn,
-      onChanged: (bool value) {
-        if (value) {
-          _showPasswordDialog();
-        } else {
-          setState(() {
-            _isScreenCaptureOn = false;
-          });
-          ScreenProtector.preventScreenshotOn();
-        }
-      },
-      secondary: const Icon(Icons.screenshot, color: Colors.blueGrey),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
@@ -673,7 +607,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             leading: const Icon(Icons.bug_report_outlined, color: Colors.orange),
                             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ReportProblemScreen())),
                           ),
-                          _buildScreenCaptureTile(),
                           const Divider(),
                           ListTile(
                             title: const Text('App Info'),

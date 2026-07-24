@@ -1,5 +1,9 @@
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ReportProblemScreen extends StatefulWidget {
   const ReportProblemScreen({super.key});
@@ -17,8 +21,11 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
     super.dispose();
   }
 
-  void _submitReport() {
-    if (_reportController.text.trim().isEmpty) {
+  bool _isSubmitting = false;
+
+  Future<void> _submitReport() async {
+    final text = _reportController.text.trim();
+    if (text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please describe the problem before submitting.'),
@@ -27,16 +34,56 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
       );
       return;
     }
-    // TODO: Implement report submission logic
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Thank you for your report!'),
-        backgroundColor: Colors.green,
-      ),
-    );
-    _reportController.clear();
-    FocusScope.of(context).unfocus();
-    Navigator.of(context).pop();
+
+    if (_isSubmitting) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final focusScope = FocusScope.of(context);
+    setState(() => _isSubmitting = true);
+
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+
+    try {
+      // 1) Persist the report in Supabase.
+      await Supabase.instance.client.from('problem_reports').insert({
+        'user_id': userId,
+        'message': text,
+      });
+
+      // 2) Email the report to daaymnco@gmail.com via FormSubmit.
+      await http.post(
+        Uri.parse('https://formsubmit.co/ajax/daaymnco@gmail.com'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({
+          'subject': 'Daaymn problem report',
+          'message': text,
+          'user': userId ?? 'anon',
+        }),
+      );
+
+      _reportController.clear();
+      focusScope.unfocus();
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Thank you for your report!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      navigator.pop();
+    } catch (e) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Could not submit your report. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
   }
 
   @override
@@ -101,8 +148,8 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                     textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  onPressed: _submitReport,
-                  child: const Text('Submit Report'),
+                  onPressed: _isSubmitting ? null : _submitReport,
+                  child: Text(_isSubmitting ? 'Submitting...' : 'Submit Report'),
                 ),
               ],
             ),

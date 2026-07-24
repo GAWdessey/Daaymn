@@ -30,6 +30,7 @@ import 'package:daaymn/realtime_service.dart';
 import 'package:daaymn/auth_screen.dart';
 import 'package:daaymn/permissions_screen.dart';
 import 'package:daaymn/services/service_locator.dart';
+import 'package:daaymn/services/consent_service.dart';
 import 'package:daaymn/globals.dart';
 
 // Tab screens for HomeScreen
@@ -100,10 +101,35 @@ Future<void> _initializeServices() async {
       anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
     );
     await PushNotificationService().init();
-    await MobileAds.instance.initialize();
+
+    // GDPR / UMP consent: gather consent (fire-and-forget so we don't block the
+    // splash), then initialize the ads SDK once it's safe to request ads. On
+    // any error the consent helper fails open so ads are never permanently
+    // blocked. NOTE: a GDPR message must be configured in the AdMob console for
+    // a consent form to actually appear.
+    unawaited(_initializeAdsWithConsent());
+
     await serviceLocator.init();
   } catch (e, stackTrace) {
     if (kDebugMode) print('An unexpected error occurred during initialization: $e\n$stackTrace');
+  }
+}
+
+/// Gathers UMP (GDPR) consent, then initializes the Mobile Ads SDK only once it
+/// is safe to request ads. Runs off the startup critical path. Any error is
+/// swallowed and ads still initialize so they are never permanently blocked.
+Future<void> _initializeAdsWithConsent() async {
+  try {
+    final canRequestAds = await ConsentService.gatherConsent();
+    if (canRequestAds) {
+      await MobileAds.instance.initialize();
+    }
+  } catch (e) {
+    if (kDebugMode) print('Ads/consent initialization error: $e');
+    // Fail open: initialize ads anyway so a consent hiccup doesn't block them.
+    try {
+      await MobileAds.instance.initialize();
+    } catch (_) {}
   }
 }
 
