@@ -30,7 +30,11 @@ service-account.json
 /android/app/src/main/assets/kernel_blob.bin
 /android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
 /android/.gradle/
-/android/gradle*
+# WRAPPER IS NOW COMMITTED (2026-08-14). This used to be `/android/gradle*`, which hid the
+# Gradle wrapper, so CI built with whatever Gradle the runner image happened to ship. That
+# drifted below Flutter's minimum and broke the first build in three weeks. Gradle's own
+# guidance is to commit the wrapper; only the build cache stays ignored.
+/android/.gradle/
 /android/local.properties
 /android/app/google-services.json
 

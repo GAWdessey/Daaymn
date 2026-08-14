@@ -1,8 +1,7 @@
-gradle-wrapper.jar
+# gradle-wrapper.jar, gradlew and gradlew.bat are DELIBERATELY TRACKED as of 2026-08-14 —
+# see the note in the root .gitignore. Do not re-add them here.
 /.gradle
 /captures/
-/gradlew
-/gradlew.bat
 /local.properties
 GeneratedPluginRegistrant.java
 .cxx/
