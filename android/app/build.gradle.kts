@@ -26,8 +26,12 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
+    // Kotlin 2.2 removed the kotlinOptions DSL ("Using 'kotlinOptions: KotlinJvmOptions' is an
+    // error"). compilerOptions is the replacement; jvmTarget is now a typed enum, not a string.
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
 
     signingConfigs {
