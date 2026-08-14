@@ -30,9 +30,12 @@ allprojects {
             }
         }
 
-        // Configure all Kotlin compile tasks.
+        // Configure all Kotlin compile tasks. Kotlin 2.2 made kotlinOptions a hard error; the
+        // replacement is compilerOptions, where jvmTarget is a typed enum rather than a string.
         tasks.withType(KotlinCompile::class.java).configureEach {
-            kotlinOptions.jvmTarget = "17"
+            compilerOptions {
+                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+            }
         }
     }
 }
