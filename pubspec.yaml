@@ -1,7 +1,7 @@
 name: daaymn
 description: "A Dating App."
 publish_to: 'none'
-version: 1.0.0+67
+version: 1.0.2+76
 
 environment:
   sdk: ^3.9.2
@@ -54,8 +54,8 @@ dependencies:
   flutter_local_notifications: ^19.5.0
 
   # In-App Purchases
-  in_app_purchase: ^3.2.3
-  in_app_purchase_android: ^0.4.0+8
+  in_app_purchase: ^3.3.0
+  in_app_purchase_android: ^0.5.2
 
   # Ads
   google_mobile_ads: ^5.1.0
