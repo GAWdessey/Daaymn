@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { google } from "npm:googleapis@105";
 import { corsHeaders } from "../_shared/cors.ts";
 import { grantSubscriptionBenefits } from "../_shared/grant-benefits.ts";
+import { claimPurchaseToken, releasePurchaseToken } from "../_shared/purchase-tokens.ts";
 
 // --- Environment Variable Validation ---
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
@@ -92,6 +93,10 @@ Deno.serve(async (req) => {
     const androidPublisher = google.androidpublisher({ version: 'v3', auth: jwt });
 
     let isValid = false;
+    // Billing period the grant is for ('' for one-time products) and the grant
+    // itself; both are set only once Google has confirmed the purchase.
+    let period = '';
+    let grant: (() => Promise<void>) | null = null;
     const isSubscription = SUBSCRIPTION_IDS.has(productId);
     console.log(`Product ID: ${productId}, Is Subscription: ${isSubscription}`);
 
@@ -107,7 +112,8 @@ Deno.serve(async (req) => {
           console.log('Acknowledging subscription...');
           await androidPublisher.purchases.subscriptions.acknowledge({ packageName: ANDROID_PACKAGE_NAME, subscriptionId: productId, token: purchaseToken });
         }
-        await grantSubscriptionBenefits(supabaseAdmin, user.id, productId, expiryTimeMillis!, purchaseToken);
+        period = expiryTimeMillis;
+        grant = () => grantSubscriptionBenefits(supabaseAdmin, user.id, productId, expiryTimeMillis!, purchaseToken);
       } else {
         console.error('Subscription verification failed:', verification);
       }
@@ -124,40 +130,59 @@ Deno.serve(async (req) => {
         }
 
         // --- Granting Benefits for One-Time Products ---
-        const likesToAdd = LIKES_MAP[productId];
-        const reportTier = REPORT_TIER_MAP[productId];
-        console.log(`Likes to add: ${likesToAdd}, Report tier: ${reportTier}`);
+        grant = async () => {
+          const likesToAdd = LIKES_MAP[productId];
+          const reportTier = REPORT_TIER_MAP[productId];
+          console.log(`Likes to add: ${likesToAdd}, Report tier: ${reportTier}`);
 
-        if (likesToAdd) {
-          console.log(`Granting ${likesToAdd} likes to user ${user.id}`);
-          const { error: rpcError } = await supabaseAdmin.rpc('grant_likes', { user_id: user.id, num_likes: likesToAdd });
-          if (rpcError) throw rpcError;
-        } else if (reportTier) {
-          console.log(`Incrementing report credit for user ${user.id} with tier ${reportTier}`);
-          const { error: rpcError } = await supabaseAdmin.rpc('increment_report_credit', { user_id_in: user.id, tier_in: reportTier });
-          if (rpcError) throw new Error(`Failed to grant report credit: ${rpcError.message}`);
-        } else {
-           const updates: { [key: string]: string } = {};
-           const unlockExpiry = new Date(Date.now() + (365 * 10 * 24 * 60 * 60 * 1000));
-           if (productId === PRODUCT_IDS.UNLOCK_VISIBILITY) {
-             updates.ghost_mode_until = unlockExpiry.toISOString();
-           } else if (productId === PRODUCT_IDS.UNLOCK_SCROLLING) {
-             updates.infinite_scroll_until = unlockExpiry.toISOString();
-           }
-           if (Object.keys(updates).length > 0) {
-            console.log(`Updating profile for user ${user.id} with:`, updates);
-             const { error: updateError } = await supabaseAdmin.from('profiles').update(updates).eq('id', user.id);
-             if (updateError) throw updateError;
-           }
-        }
+          if (likesToAdd) {
+            console.log(`Granting ${likesToAdd} likes to user ${user.id}`);
+            const { error: rpcError } = await supabaseAdmin.rpc('grant_likes', { user_id: user.id, num_likes: likesToAdd });
+            if (rpcError) throw rpcError;
+          } else if (reportTier) {
+            console.log(`Incrementing report credit for user ${user.id} with tier ${reportTier}`);
+            const { error: rpcError } = await supabaseAdmin.rpc('increment_report_credit', { user_id_in: user.id, tier_in: reportTier });
+            if (rpcError) throw new Error(`Failed to grant report credit: ${rpcError.message}`);
+          } else {
+            const updates: { [key: string]: string } = {};
+            const unlockExpiry = new Date(Date.now() + (365 * 10 * 24 * 60 * 60 * 1000));
+            if (productId === PRODUCT_IDS.UNLOCK_VISIBILITY) {
+              updates.ghost_mode_until = unlockExpiry.toISOString();
+            } else if (productId === PRODUCT_IDS.UNLOCK_SCROLLING) {
+              updates.infinite_scroll_until = unlockExpiry.toISOString();
+            }
+            if (Object.keys(updates).length > 0) {
+              console.log(`Updating profile for user ${user.id} with:`, updates);
+              const { error: updateError } = await supabaseAdmin.from('profiles').update(updates).eq('id', user.id);
+              if (updateError) throw updateError;
+            }
+          }
+        };
       } else {
         console.error('One-time product verification failed:', verification);
       }
     }
 
-    if (!isValid) {
+    if (!isValid || !grant) {
       console.error('Purchase could not be verified.');
       return new Response(JSON.stringify({ error: 'Purchase could not be verified' }), { status: 400, headers: corsHeaders });
+    }
+
+    // --- Replay protection: grant only on the first claim of this token ---
+    const claim = await claimPurchaseToken(supabaseAdmin, purchaseToken, period, user.id, productId);
+    if (claim === 'claimed_by_other') {
+      console.error(`Purchase token for ${productId} was already redeemed by another user.`);
+      return new Response(JSON.stringify({ error: 'Purchase already redeemed' }), { status: 409, headers: corsHeaders });
+    }
+    if (claim === 'already_claimed') {
+      console.log(`Purchase token for ${productId} already redeemed by user ${user.id}; not granting again.`);
+      return new Response(JSON.stringify({ message: `Purchase already processed: ${productId}` }), { status: 200, headers: corsHeaders });
+    }
+    try {
+      await grant();
+    } catch (grantError) {
+      await releasePurchaseToken(supabaseAdmin, purchaseToken, period);
+      throw grantError;
     }
 
     console.log('Purchase verified successfully.');

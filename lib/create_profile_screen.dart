@@ -299,7 +299,12 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     }
 
     try {
-      return await Geolocator.getCurrentPosition(forceAndroidLocationManager: true);
+      // Approximate is all we say we keep, and all distance matching needs
+      return await Geolocator.getCurrentPosition(
+        locationSettings: Platform.isAndroid
+            ? AndroidSettings(accuracy: LocationAccuracy.low, forceLocationManager: true)
+            : const LocationSettings(accuracy: LocationAccuracy.low),
+      );
     } catch (e) {
        if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to get location: $e")));
        return null;

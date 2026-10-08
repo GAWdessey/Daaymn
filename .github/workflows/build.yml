@@ -18,7 +18,8 @@ jobs:
           channel: stable
       - run: flutter --version
       - run: flutter pub get
-      - run: flutter analyze --no-fatal-infos --no-fatal-warnings || true
+      - run: flutter analyze --no-fatal-infos --no-fatal-warnings
+      - run: flutter test
       # ---- release signing from repo secrets ----
       - name: Decode upload keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/upload.jks

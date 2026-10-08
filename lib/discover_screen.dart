@@ -212,7 +212,7 @@ class DiscoverScreenState extends State<DiscoverScreen> with AutomaticKeepAliveC
 
       final interactedUserIds = {...likedUserIds, ...dislikedUserIds, ...myBlockedIds, ...whoBlockedMeIds}.toList();
 
-      var query = supabase.from('profiles').select().neq('id', currentUserId);
+      var query = supabase.from('public_profiles').select().neq('id', currentUserId);
 
       if (interactedUserIds.isNotEmpty) {
         query = query.not('id', 'in', interactedUserIds);
@@ -360,7 +360,7 @@ class DiscoverScreenState extends State<DiscoverScreen> with AutomaticKeepAliveC
         return;
       }
 
-      var profilesQuery = supabase.from('profiles').select().inFilter('id', dislikedUserIds);
+      var profilesQuery = supabase.from('public_profiles').select().inFilter('id', dislikedUserIds);
 
       final interestedIn = widget.userProfile.interestedIn;
       if (interestedIn != null && interestedIn.isNotEmpty && !interestedIn.contains('Everyone')) {

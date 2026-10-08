@@ -883,7 +883,7 @@ class HomeScreenState extends State<HomeScreen> {
         context: context,
         builder: (context) => DaaymnDialog(
           title: 'Out of Likes!',
-          message: "Daaymn, you're out of likes! Don't let this one get away. Top up your likes for just R4.99 each and shoot your shot!",
+          message: "Daaymn, you're out of likes! Don't let this one get away. Top up your likes for just R2.29 each and shoot your shot!",
           buttonText: 'Buy Likes',
           onButtonPressed: () {
             Navigator.of(context).pop();
@@ -902,7 +902,7 @@ class HomeScreenState extends State<HomeScreen> {
         context: context,
         builder: (context) => DaaymnDialog(
           title: 'No Likes Left!',
-          message: "No likes left to power up your Super Like! Buy a pack (from R4.99) to fill up the heart and send that Daaymn OTM.",
+          message: "No likes left to power up your Super Like! Buy a pack (from R2.29) to fill up the heart and send that Daaymn OTM.",
           buttonText: 'Buy Likes',
           onButtonPressed: () {
             Navigator.of(context).pop();
@@ -921,7 +921,7 @@ class HomeScreenState extends State<HomeScreen> {
         context: context,
         builder: (context) => DaaymnDialog(
           title: 'No Likes Left!',
-          message: "Daaymn! You need a like to accept a like. It's the circle of life. For just R4.99, you can make this match happen!",
+          message: "Daaymn! You need a like to accept a like. It's the circle of life. For just R2.29, you can make this match happen!",
           buttonText: 'Buy Likes',
           onButtonPressed: () {
             Navigator.of(context).pop();

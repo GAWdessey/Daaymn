@@ -1,0 +1,3 @@
+-- Applied from the Supabase dashboard; its SQL wasn't recorded in the migration
+-- history, so this file only keeps local and remote versions in step.
+-- What it did is in the live schema snapshot, supabase/schema/live-schema.sql.

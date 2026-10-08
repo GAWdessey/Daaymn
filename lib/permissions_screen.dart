@@ -18,7 +18,7 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
   final List<Map<String, dynamic>> _permissionSteps = [
     {
       'title': 'Location Access',
-      'description': 'We use your approximate location to show you potential matches in your area. We only need your location while you\'re using the app.',
+      'description': 'We save your approximate location with your profile so we can add matching by distance. For now it isn\'t used to choose who you see. We only check it while you\'re using the app.',
       'icon': Icons.location_on,
       'permissions': [Permission.locationWhenInUse],
     },

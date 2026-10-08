@@ -122,7 +122,7 @@ class _LikedYouScreenState extends State<LikedYouScreen> with AutomaticKeepAlive
         return;
       }
 
-      final profilesResponse = await supabase.from('profiles').select().inFilter('id', profilesToShowIds);
+      final profilesResponse = await supabase.from('public_profiles').select().inFilter('id', profilesToShowIds);
 
       if (mounted) {
         final profiles = (profilesResponse as List).map((data) => Profile.fromJson(data)).toList();

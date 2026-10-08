@@ -962,47 +962,47 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
       switch (productId) {
         case kProductIdLike1:
           title = '1 Like';
-          price = 'R4.99';
+          price = 'R2.29';
           break;
         case kProductIdLike10:
           title = '10 Likes';
-          price = 'R44.99';
+          price = 'R22.99';
           break;
         case kProductIdLike20:
           title = '20 Likes';
-          price = 'R79.99';
+          price = 'R45.99';
           break;
         case kProductIdReportBasic:
           title = 'Basic Report';
-          price = 'R19.99';
+          price = 'R114.99';
           break;
         case kProductIdReportPro:
           title = 'Pro Report';
-          price = 'R39.99';
+          price = 'R169.99';
           break;
         case kProductIdReportDeluxe:
           title = 'Deluxe Report';
-          price = 'R59.99';
+          price = 'R229.99';
           break;
         case kProductIdUnlockScrolling:
           title = 'Unlock Infinite Scrolling';
-          price = 'R19.99/month';
+          price = 'R22.99';
           break;
         case kProductIdUnlockVisibility:
           title = 'Unlock Online Status Toggle';
-          price = 'R19.99/month';
+          price = 'R22.99';
           break;
         case kProductIdSubStandard:
           title = 'Standard';
-          price = 'R159.99/month';
+          price = 'R114.99/month';
           break;
         case kProductIdSubPro:
           title = 'Pro';
-          price = 'R269.99/month';
+          price = 'R194.99/month';
           break;
         case kProductIdSubDeluxe:
           title = 'Deluxe';
-          price = 'R459.99/month';
+          price = 'R299.99/month';
           break;
         default:
           title = 'Test Product';

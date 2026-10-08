@@ -40,6 +40,11 @@ serve(async (req) => {
     { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
   );
 
+  const supabaseAdmin = createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+  );
+
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -49,18 +54,37 @@ serve(async (req) => {
     );
   }
 
+  // Only grant against a code this user redeemed (via redeem-promo-code) and
+  // hasn't claimed yet; the client's productId alone proves nothing.
+  const { data: redemptionId, error: claimError } = await supabaseAdmin.rpc('claim_promo_redemption', {
+    p_user_id: user.id,
+    p_product_id: productId,
+  });
+  if (claimError) {
+    return new Response(
+      JSON.stringify({ error: 'Failed to grant promo item.', details: claimError.message }),
+      { headers: { "Content-Type": "application/json" }, status: 500 },
+    );
+  }
+  if (!redemptionId) {
+    return new Response(
+      JSON.stringify({ error: 'No redeemed promo code for this item.' }),
+      { headers: { "Content-Type": "application/json" }, status: 403 },
+    );
+  }
+
   try {
     const likesToAdd = LIKES_MAP[productId];
     const reportTier = REPORT_TIER_MAP[productId];
 
     if (likesToAdd) {
-      const { error } = await supabase.rpc('grant_likes', { 
+      const { error } = await supabaseAdmin.rpc('grant_likes', { 
         user_id: user.id, 
         num_likes: likesToAdd
       });
       if (error) throw new Error(`Failed to grant likes: ${error.message}`);
     } else if (reportTier) {
-      const { error } = await supabase.rpc('increment_report_credit', { 
+      const { error } = await supabaseAdmin.rpc('increment_report_credit', { 
         user_id_in: user.id, 
         tier_in: reportTier 
       });
@@ -75,6 +99,8 @@ serve(async (req) => {
       { headers: { "Content-Type": "application/json" }, status: 200 },
     );
   } catch (error) {
+    // Let the user retry the claim
+    await supabaseAdmin.from('promo_redemptions').update({ claimed_at: null }).eq('id', redemptionId);
     return new Response(
       JSON.stringify({ error: 'Failed to grant promo item.', details: error.message }),
       { headers: { "Content-Type": "application/json" }, status: 500 },

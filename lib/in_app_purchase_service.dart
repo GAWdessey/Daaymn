@@ -35,7 +35,6 @@ const Set<String> _kProductIds = <String>{
 const String _kPrefixLike = 'daaymn_like';
 const String _kPrefixReport = 'daaymn_report';
 const String _kPrefixUnlock = 'daaymn_unlock';
-const String _kPrefixSubscription = 'daaymn_sub';
 
 enum _LogLevel { info, warning, error }
 
@@ -323,13 +322,7 @@ class InAppPurchaseService extends ChangeNotifier {
     }
 
     try {
-      if (productId.startsWith(_kPrefixSubscription)) {
-        _log('Product is a subscription. Resetting monthly report claim status for user $userId.');
-        await Supabase.instance.client.from('profiles').update({
-          'has_claimed_monthly_report': false,
-        }).eq('id', userId);
-      }
-
+      // verify-google-purchase resets the monthly report claim for subscriptions
       final verificationData = purchase.verificationData.serverVerificationData;
       if (verificationData.isEmpty) {
         _log('Purchase verification data is MISSING for ${purchase.productID}. Cannot verify with server.', level: _LogLevel.error);

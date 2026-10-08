@@ -41,23 +41,11 @@ verify_jwt = true
 import_map = "./functions/claim-free-like/deno.json"
 entrypoint = "./functions/claim-free-like/index.ts"
 
-[functions.unlock-feature]
-enabled = true
-verify_jwt = true
-import_map = "./functions/unlock-feature/deno.json"
-entrypoint = "./functions/unlock-feature/index.ts"
-
 [functions.verify-google-purchase]
 enabled = true
 verify_jwt = false
 import_map = "./functions/verify-google-purchase/deno.json"
 entrypoint = "./functions/verify-google-purchase/index.ts"
-
-[functions.grant-report-credit]
-enabled = true
-verify_jwt = true
-import_map = "./functions/grant-report-credit/deno.json"
-entrypoint = "./functions/grant-report-credit/index.ts"
 
 [functions.claim-monthly-report]
 enabled = true
@@ -82,3 +70,17 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/handle-google-rtdn/deno.json"
 entrypoint = "./functions/handle-google-rtdn/index.ts"
+
+# These check the caller themselves (or are public by design) and are deployed
+# with JWT verification off; listed so a CI deploy doesn't switch it back on.
+[functions.verify-report]
+enabled = true
+verify_jwt = false
+
+[functions.claim-one-time-report]
+enabled = true
+verify_jwt = false
+
+[functions.grant-promo-item]
+enabled = true
+verify_jwt = false

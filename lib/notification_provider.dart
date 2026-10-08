@@ -325,7 +325,7 @@ class MessageProvider extends ChangeNotifier {
         return;
       }
 
-      final profilesResponse = await supabase.from('profiles').select().inFilter('id', allRelevantUserIds.toList());
+      final profilesResponse = await supabase.from('public_profiles').select().inFilter('id', allRelevantUserIds.toList());
 
       final otherUsers = profilesResponse.map((data) => Profile.fromJson(data)).toList();
 

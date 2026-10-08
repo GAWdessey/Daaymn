@@ -46,6 +46,10 @@ class ChatScreenState extends State<ChatScreen> {
   RealtimeChannel? _messageChannel;
   RealtimeChannel? _typingChannel;
 
+  // Other users are read through the public_profiles view, which realtime
+  // can't stream, so the header polls it for online status.
+  late final Stream<List<Map<String, dynamic>>> _otherUserStream = _watchOtherUser();
+
   bool _isOtherUserTyping = false;
   Timer? _typingIndicatorTimer;
   DateTime? _lastTypingSendTime;
@@ -104,6 +108,17 @@ class ChatScreenState extends State<ChatScreen> {
         _setupMessageListener();
         _setupTypingListener();
       }
+    }
+  }
+
+  Stream<List<Map<String, dynamic>>> _watchOtherUser() async* {
+    while (mounted) {
+      try {
+        yield await supabase.from('public_profiles').select().eq('id', widget.otherUser.id);
+      } catch (e) {
+        debugPrint('Failed to refresh ${widget.otherUser.id}: $e');
+      }
+      await Future.delayed(const Duration(seconds: 30));
     }
   }
 
@@ -564,9 +579,9 @@ class ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
         title: StreamBuilder<List<Map<String, dynamic>>>(
-          stream: supabase.from('profiles').stream(primaryKey: ['id']).eq('id', widget.otherUser.id),
+          stream: _otherUserStream,
           builder: (context, snapshot) {
-            final otherUserProfile = snapshot.hasData ? Profile.fromJson(snapshot.data!.first) : widget.otherUser;
+            final otherUserProfile = snapshot.data?.isNotEmpty == true ? Profile.fromJson(snapshot.data!.first) : widget.otherUser;
             final isOnline = otherUserProfile.lastSeen != null && DateTime.now().difference(otherUserProfile.lastSeen!).inMinutes < 5;
             return Row(
               mainAxisSize: MainAxisSize.min,

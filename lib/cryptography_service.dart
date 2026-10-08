@@ -89,7 +89,7 @@ class CryptographyService {
   Future<String?> getPublicKey(String userId) async {
     try {
       final response = await Supabase.instance.client
-          .from('profiles')
+          .from('public_profiles')
           .select('public_key')
           .eq('id', userId)
           .single();

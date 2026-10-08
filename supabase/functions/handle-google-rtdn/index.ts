@@ -2,6 +2,7 @@ import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { google } from 'npm:googleapis@105';
 import { grantSubscriptionBenefits } from '../_shared/grant-benefits.ts';
+import { claimPurchaseToken, releasePurchaseToken } from '../_shared/purchase-tokens.ts';
 
 function getServiceAccountKey() {
   const keyJson = Deno.env.get('GOOGLE_SERVICE_ACCOUNT_KEY');
@@ -115,14 +116,27 @@ serve(async (req) => {
       return new Response('Subscription is not active, acknowledging to prevent retries.', { status: 200 });
     }
 
+    // Replay protection: a billing period is granted once, whether it arrives
+    // here or through verify-google-purchase.
+    const claim = await claimPurchaseToken(supabaseAdmin, purchaseToken, expiryTimeMillis, userId, productId);
+    if (claim !== 'claimed') {
+      console.log(`Billing period ${expiryTimeMillis} already granted (${claim}); not granting again.`);
+      return new Response('Billing period already granted.', { status: 200 });
+    }
+
     console.log(`Granting subscription benefits to user ${userId}...`);
-    await grantSubscriptionBenefits(
-      supabaseAdmin,
-      userId,
-      productId,
-      expiryTimeMillis,
-      purchaseToken
-    );
+    try {
+      await grantSubscriptionBenefits(
+        supabaseAdmin,
+        userId,
+        productId,
+        expiryTimeMillis,
+        purchaseToken
+      );
+    } catch (grantError) {
+      await releasePurchaseToken(supabaseAdmin, purchaseToken, expiryTimeMillis);
+      throw grantError;
+    }
 
     console.log(`--- Successfully processed RTDN for user ${userId} ---`);
     return new Response('Notification processed successfully.', { status: 200 });

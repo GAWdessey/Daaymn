@@ -161,7 +161,7 @@ class _YourLikesScreenState extends State<YourLikesScreen> {
         return;
       }
       
-      final profilesResponse = await supabase.from('profiles').select().inFilter('id', profilesToShowIds);
+      final profilesResponse = await supabase.from('public_profiles').select().inFilter('id', profilesToShowIds);
       final profiles = profilesResponse.map((data) => Profile.fromJson(data)).toList();
 
       final List<LikedProfile> myLikes = [];
@@ -275,7 +275,7 @@ class _YourLikesScreenState extends State<YourLikesScreen> {
     if (controller == null || controller.text.trim().isEmpty) return;
     final content = controller.text.trim();
     try {
-      final otherUserResponse = await supabase.from('profiles').select('public_key').eq('id', likedProfile.profile.id).single();
+      final otherUserResponse = await supabase.from('public_profiles').select('public_key').eq('id', likedProfile.profile.id).single();
       final otherUserPublicKeyString = otherUserResponse['public_key'] as String?;
       if (otherUserPublicKeyString == null || otherUserPublicKeyString.isEmpty) {
         throw Exception('This user cannot receive encrypted messages yet.');

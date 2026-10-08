@@ -1,0 +1,40 @@
+name: deploy-supabase
+# Keeps the live backend in step with main: applies new migrations, then
+# redeploys every edge function, so nothing runs that wasn't reviewed here.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/**'
+      - '.github/workflows/deploy-supabase.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-supabase
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      PROJECT_REF: rrbsjmfwahaerkfhpegv
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: supabase link --project-ref "$PROJECT_REF"
+      # Migrations first, so functions never run against a schema they don't expect
+      - run: supabase db push --linked
+      # Every folder with an index.ts is a function (skips _shared and node_modules)
+      - name: Deploy edge functions
+        run: |
+          for dir in supabase/functions/*/; do
+            name=$(basename "$dir")
+            [ -f "$dir/index.ts" ] || continue
+            case "$name" in _*) continue ;; esac
+            supabase functions deploy "$name" --project-ref "$PROJECT_REF" --use-api
+          done
