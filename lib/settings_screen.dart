@@ -124,7 +124,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return [
       ShowcaseItem(key: _signOutKey, description: 'Sign out of your account here.'),
       ShowcaseItem(key: _deleteAccountKey, description: 'Delete your account permanently. This cannot be undone!'),
-      ShowcaseItem(key: _verifyProfileKey, description: 'Verify your profile to prove you\'re a real person and get a badge!'),
+      ShowcaseItem(key: _verifyProfileKey, description: faceVerificationEnabled
+          ? 'Verify your profile to prove you\'re a real person and get a badge!'
+          : 'Profile verification is coming soon.'),
       ShowcaseItem(key: _interestsKey, description: 'Change who you\'re interested in seeing.'),
       ShowcaseItem(key: _pollsKey, description: 'Answer polls to improve your matches.'),
       ShowcaseItem(key: _themeKey, description: 'Customize the app\'s look and feel.'),
@@ -494,6 +496,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             title: Text(userProfile.isVerified ? 'Profile Verified' : 'Verify Your Profile'),
                             subtitle: userProfile.isVerified
                                 ? const Text('You\'re an official, real person!')
+                                : !faceVerificationEnabled
+                                ? const Text('Coming soon')
                                 : RichText(
                                     text: TextSpan(
                                       style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7)),
@@ -504,7 +508,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       ],
                                     ),
                                   ),
-                            onTap: userProfile.isVerified ? null : _startVerificationProcess,
+                            onTap: userProfile.isVerified || !faceVerificationEnabled ? null : _startVerificationProcess,
                           ),
                           const Divider(),
                           _buildSectionHeader('Core Preferences'),

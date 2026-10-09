@@ -16,6 +16,7 @@ import 'package:daaymn/widgets/verified_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:screen_protector/screen_protector.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -641,6 +642,7 @@ class HomeScreenState extends State<HomeScreen> {
       _setupListeners();
       _startLikeCountdownTimer();
       _startPresenceTimer();
+      _reportAppVersion();
       if (mounted) {
         final notificationProvider = context.read<NotificationProvider>();
         notificationProvider.refresh();
@@ -697,6 +699,20 @@ class HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       if (kDebugMode) {
         print('[Presence] Error updating last_seen: $e');
+      }
+    }
+  }
+
+  // Lets the backend count how many active users are on each release
+  Future<void> _reportAppVersion() async {
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      final versionCode = int.tryParse(packageInfo.buildNumber);
+      if (versionCode == null) return;
+      await supabaseClient.client.rpc('report_app_version', params: {'p_version_code': versionCode});
+    } catch (e) {
+      if (kDebugMode) {
+        print('[AppVersion] Error reporting app version: $e');
       }
     }
   }

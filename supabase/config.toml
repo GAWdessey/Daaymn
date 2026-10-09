@@ -71,6 +71,12 @@ verify_jwt = false
 import_map = "./functions/handle-google-rtdn/deno.json"
 entrypoint = "./functions/handle-google-rtdn/index.ts"
 
+[functions.verify-face]
+enabled = true
+verify_jwt = true
+import_map = "./functions/verify-face/deno.json"
+entrypoint = "./functions/verify-face/index.ts"
+
 # These check the caller themselves (or are public by design) and are deployed
 # with JWT verification off; listed so a CI deploy doesn't switch it back on.
 [functions.verify-report]

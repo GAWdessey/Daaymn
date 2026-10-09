@@ -3,6 +3,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 final supabase = Supabase.instance.client;
 
+// Off until verify-face has a face-matching service behind it (it answers
+// "not available" without one). Badges already earned still show; the release
+// that turns this on also ships supabase/pending/clear_verified_badges.sql.
+const faceVerificationEnabled = false;
+
 // --- Models ---
 
 class Message {
