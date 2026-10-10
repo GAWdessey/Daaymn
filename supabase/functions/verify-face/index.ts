@@ -74,6 +74,29 @@ Deno.serve(async (req) => {
       return json({ error: 'Too many verification attempts today. Please try again tomorrow.' }, 429)
     }
 
+    // Every Rekognition call is billed, so stop at the monthly cap in app_config
+    // (none set means none allowed)
+    const { data: capRow, error: capError } = await supabaseAdmin
+      .from('app_config')
+      .select('value')
+      .eq('key', 'face_compare_monthly_cap')
+      .maybeSingle()
+    if (capError) throw capError
+    const monthlyCap = Number(capRow?.value ?? 0)
+    const now = new Date()
+    const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString()
+    const { data: monthRows, error: monthError } = await supabaseAdmin
+      .from('face_verification_attempts')
+      .select('compare_calls')
+      .gt('compare_calls', 0)
+      .gte('created_at', monthStart)
+    if (monthError) throw monthError
+    let callsLeft = monthlyCap - (monthRows ?? []).reduce((sum, r) => sum + r.compare_calls, 0)
+    if (callsLeft <= 0) {
+      console.error('verify-face: monthly compare cap reached', monthlyCap)
+      return json({ error: 'Verification is not available right now. Please try again later.' }, 503)
+    }
+
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('image_urls')
@@ -96,12 +119,20 @@ Deno.serve(async (req) => {
 
     let bestSimilarity = 0
     let selfieHasFace = true
+    let compareCalls = 0
+    let capReached = false
     for (const path of paths) {
+      if (callsLeft <= 0) {
+        capReached = true
+        break
+      }
       const { data: blob, error: downloadError } = await supabaseAdmin.storage.from(BUCKET).download(path)
       if (downloadError || !blob) continue
       const photoBytes = new Uint8Array(await blob.arrayBuffer())
       if (photoBytes.length > MAX_IMAGE_BYTES) continue
 
+      compareCalls++
+      callsLeft--
       try {
         const result = await rekognition.send(new CompareFacesCommand({
           SourceImage: { Bytes: selfieBytes },
@@ -131,7 +162,12 @@ Deno.serve(async (req) => {
       user_id: user.id,
       verified,
       similarity: bestSimilarity,
+      compare_calls: compareCalls,
     })
+
+    if (!verified && capReached) {
+      return json({ error: 'Verification is not available right now. Please try again later.' }, 503)
+    }
 
     if (verified) {
       const { error: updateError } = await supabaseAdmin

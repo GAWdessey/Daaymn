@@ -3,9 +3,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 final supabase = Supabase.instance.client;
 
-// Off until verify-face has a face-matching service behind it (it answers
-// "not available" without one). Badges already earned still show; the release
-// that turns this on also ships supabase/pending/clear_verified_badges.sql.
+// Off until Daaymn earns money: Rekognition bills every face check and the AWS
+// account has no free allowance (decided 2026-10-10). verify-face answers
+// "not available" until it has a key and face_compare_monthly_cap is raised.
+// Badges already earned still show; the release that turns this on also ships
+// supabase/pending/clear_verified_badges.sql.
 const faceVerificationEnabled = false;
 
 // --- Models ---
