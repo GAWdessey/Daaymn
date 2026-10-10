@@ -2,7 +2,7 @@
 """Creates (or refreshes) the screenshot test account on the live project.
 
 The account is for recording store screenshots and clips on an emulator. It is
-not a member: it's flagged is_seed_profile like the 10 stock-photo seed
+not a member: it's flagged is_seed_profile like the 10 AI-photo seed
 profiles, it only likes and matches with those seeds, and it blocks every real
 member, so no real face or name reaches its screens and members never see it.
 Re-run it before a recording session: members who joined since get blocked too.
@@ -26,26 +26,23 @@ EMAIL = 'daaymnco+screenshots@gmail.com'
 CREDS = pathlib.Path(__file__).resolve().parents[2] / '.test-account.env'
 SEED_PHOTOS = f'{URL}/storage/v1/object/public/seed-photos'
 
-# The seed photo sets were uploaded out of order: person_2..5 are women and
-# person_8 and 9 are men, so the original 5-male/5-female lineup showed women
-# as Ben or Ethan and a man as Isla. Each seed's name, gender and set, by id,
-# as checked by eye on 2026-10-10. There are only three sets of men, so David
-# and Ethan became Dana and Eva.
+# Demo photos are AI-made (see .symbiot/seed-photos-ai/SOURCE.md), uploaded
+# to seed-photos/ai/<name>_<n>.jpg. Each seed's name, gender and photo set, by
+# id; Dana and Eva became David and Ethan to match the AI sets.
 SEEDS = {
-    '50bcc22a-6526-437e-87e7-7700e8be93f0': ('Alex', 'Male', 1),
-    '6a03b42a-4445-4629-bd57-2ad2f497f396': ('Ben', 'Male', 8),
-    '51565223-c916-4f55-97bd-b5ddd8673e77': ('Chris', 'Male', 9),
-    '5938dd68-3cc8-41d0-809b-b4f178a3f7d2': ('Dana', 'Female', 4),
-    '3534cdb9-fdea-4a24-a8b9-25e248964b21': ('Eva', 'Female', 5),
-    '3ee6856d-8b77-4548-9c5d-75f0e41e4aa5': ('Fiona', 'Female', 6),
-    '8577f4ba-7a25-47d6-81f6-6efbf4ba5205': ('Grace', 'Female', 7),
-    'ecce3af3-5e5b-45c3-8c68-eb562428f509': ('Hannah', 'Female', 2),
-    '1e95110f-634e-4931-acb5-ed90a53192ac': ('Isla', 'Female', 3),
-    'de3a43ef-2b17-4cb4-ad37-761eb1d8ba7f': ('Jessica', 'Female', 10),
+    '50bcc22a-6526-437e-87e7-7700e8be93f0': ('Alex', 'Male'),
+    '6a03b42a-4445-4629-bd57-2ad2f497f396': ('Ben', 'Male'),
+    '51565223-c916-4f55-97bd-b5ddd8673e77': ('Chris', 'Male'),
+    '5938dd68-3cc8-41d0-809b-b4f178a3f7d2': ('David', 'Male'),
+    '3534cdb9-fdea-4a24-a8b9-25e248964b21': ('Ethan', 'Male'),
+    '3ee6856d-8b77-4548-9c5d-75f0e41e4aa5': ('Fiona', 'Female'),
+    '8577f4ba-7a25-47d6-81f6-6efbf4ba5205': ('Grace', 'Female'),
+    'ecce3af3-5e5b-45c3-8c68-eb562428f509': ('Hannah', 'Female'),
+    '1e95110f-634e-4931-acb5-ed90a53192ac': ('Isla', 'Female'),
+    'de3a43ef-2b17-4cb4-ad37-761eb1d8ba7f': ('Jessica', 'Female'),
 }
-# The account is a man interested in women, so Discover shows only the female
-# seeds; Chris's photos stand in for the account's own.
-OWN_PHOTOS = 9
+OWN_PHOTOS = 'sam'
+AI_PHOTOS = pathlib.Path(__file__).resolve().parents[2] / '.symbiot' / 'seed-photos-ai'
 LIKED_BY = ['Fiona', 'Grace', 'Isla']  # Liked You; Fiona and Grace are matches
 LIKES = ['Fiona', 'Grace', 'Hannah']   # Your Likes; Hannah is one-sided
 
@@ -94,17 +91,32 @@ def ensure_user(pw):
                 {'email': EMAIL, 'password': pw, 'email_confirm': True})['id']
 
 
-def photos(n):
-    return [f'{SEED_PHOTOS}/person_{n}_{i}.jpg' for i in (1, 2, 3)]
+def photos(name):
+    return [f'{SEED_PHOTOS}/ai/{name.lower()}_{i}.jpg' for i in (1, 2, 3)]
+
+
+def upload_photos():
+    for f in sorted(AI_PHOTOS.glob('*.jpg')):
+        req = urllib.request.Request(f'{URL}/storage/v1/object/seed-photos/ai/{f.name}',
+                                     method='POST', data=f.read_bytes())
+        req.add_header('apikey', KEY)
+        req.add_header('Authorization', f'Bearer {KEY}')
+        req.add_header('Content-Type', 'image/jpeg')
+        req.add_header('x-upsert', 'true')
+        try:
+            urllib.request.urlopen(req).read()
+        except urllib.error.HTTPError as e:
+            raise SystemExit(f'upload {f.name}: {e.code} {e.read().decode()}')
 
 
 def fix_seeds():
-    for sid, (name, gender, n) in SEEDS.items():
+    for sid, (name, gender) in SEEDS.items():
         call('PATCH', f'/rest/v1/profiles?id=eq.{sid}&is_seed_profile=eq.true',
-             {'name': name, 'gender': gender, 'image_urls': photos(n)})
+             {'name': name, 'gender': gender, 'image_urls': photos(name)})
 
 
 def main():
+    upload_photos()
     fix_seeds()
     pw = password()
     uid = ensure_user(pw)
@@ -123,7 +135,7 @@ def main():
         'age': 27,
         'gender': 'Male',
         'pronouns': 'he/him',
-        'interested_in': ['Female'],
+        'interested_in': ['Female', 'Male'],
         'city': 'Cape Town',
         'image_urls': photos(OWN_PHOTOS),
         'best_photo_index': 0,
