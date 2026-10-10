@@ -49,3 +49,6 @@ service-account.json
 
 # Secrets - never commit
 .env
+
+# Screenshot test account credentials (supabase/scripts/test_account.py)
+.test-account.env

@@ -1,9 +1,11 @@
 name: deploy-supabase
-# Keeps the live backend in step with main: applies new migrations, then
+# Keeps the live backend in step with master: applies new migrations, then
 # redeploys every edge function, so nothing runs that wasn't reviewed here.
+# Not main: that branch is the GitHub Pages site (privacy policy, account
+# deletion, password reset), with no history in common with the app.
 on:
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - 'supabase/**'
       - '.github/workflows/deploy-supabase.yml'
