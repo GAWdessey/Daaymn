@@ -26,8 +26,26 @@ EMAIL = 'daaymnco+screenshots@gmail.com'
 CREDS = pathlib.Path(__file__).resolve().parents[2] / '.test-account.env'
 SEED_PHOTOS = f'{URL}/storage/v1/object/public/seed-photos'
 
-# Seeds by name. The account is a man interested in women, so Discover shows
-# only the five female seeds; Ethan's photos stand in for the account's own.
+# The seed photo sets were uploaded out of order: person_2..5 are women and
+# person_8 and 9 are men, so the original 5-male/5-female lineup showed women
+# as Ben or Ethan and a man as Isla. Each seed's name, gender and set, by id,
+# as checked by eye on 2026-10-10. There are only three sets of men, so David
+# and Ethan became Dana and Eva.
+SEEDS = {
+    '50bcc22a-6526-437e-87e7-7700e8be93f0': ('Alex', 'Male', 1),
+    '6a03b42a-4445-4629-bd57-2ad2f497f396': ('Ben', 'Male', 8),
+    '51565223-c916-4f55-97bd-b5ddd8673e77': ('Chris', 'Male', 9),
+    '5938dd68-3cc8-41d0-809b-b4f178a3f7d2': ('Dana', 'Female', 4),
+    '3534cdb9-fdea-4a24-a8b9-25e248964b21': ('Eva', 'Female', 5),
+    '3ee6856d-8b77-4548-9c5d-75f0e41e4aa5': ('Fiona', 'Female', 6),
+    '8577f4ba-7a25-47d6-81f6-6efbf4ba5205': ('Grace', 'Female', 7),
+    'ecce3af3-5e5b-45c3-8c68-eb562428f509': ('Hannah', 'Female', 2),
+    '1e95110f-634e-4931-acb5-ed90a53192ac': ('Isla', 'Female', 3),
+    'de3a43ef-2b17-4cb4-ad37-761eb1d8ba7f': ('Jessica', 'Female', 10),
+}
+# The account is a man interested in women, so Discover shows only the female
+# seeds; Chris's photos stand in for the account's own.
+OWN_PHOTOS = 9
 LIKED_BY = ['Fiona', 'Grace', 'Isla']  # Liked You; Fiona and Grace are matches
 LIKES = ['Fiona', 'Grace', 'Hannah']   # Your Likes; Hannah is one-sided
 
@@ -76,7 +94,18 @@ def ensure_user(pw):
                 {'email': EMAIL, 'password': pw, 'email_confirm': True})['id']
 
 
+def photos(n):
+    return [f'{SEED_PHOTOS}/person_{n}_{i}.jpg' for i in (1, 2, 3)]
+
+
+def fix_seeds():
+    for sid, (name, gender, n) in SEEDS.items():
+        call('PATCH', f'/rest/v1/profiles?id=eq.{sid}&is_seed_profile=eq.true',
+             {'name': name, 'gender': gender, 'image_urls': photos(n)})
+
+
 def main():
+    fix_seeds()
     pw = password()
     uid = ensure_user(pw)
     CREDS.write_text(
@@ -96,8 +125,8 @@ def main():
         'pronouns': 'he/him',
         'interested_in': ['Female'],
         'city': 'Cape Town',
-        'image_urls': [f'{SEED_PHOTOS}/person_5_{i}.jpg' for i in (1, 2, 3)],
-        'best_photo_index': 1,
+        'image_urls': photos(OWN_PHOTOS),
+        'best_photo_index': 0,
         'metric_system': 'Metric',
         'work': {'show': True, 'value': 'Designer'},
         'religion': {'show': False, 'value': ''},
@@ -111,6 +140,10 @@ def main():
             "A hill I'm willing to die on": 'Pineapple belongs on pizza.',
         },
         'like_count': 20,
+        # The app reads ghost_mode_until and infinite_scroll_until; the
+        # purchased_* columns alone don't show the Settings switch
+        'ghost_mode_until': year,
+        'infinite_scroll_until': year,
         'purchased_ghost_mode_until': year,
         'purchased_infinite_scroll_until': year,
         'is_seed_profile': True,
