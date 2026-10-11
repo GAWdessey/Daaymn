@@ -69,7 +69,10 @@ Future<void> main() async {
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   try {
-    await ScreenProtector.protectDataLeakageOn();
+    // Marketing builds pass --dart-define=ALLOW_SCREEN_RECORDING=true so the app can be filmed.
+    if (!const bool.fromEnvironment('ALLOW_SCREEN_RECORDING')) {
+      await ScreenProtector.protectDataLeakageOn();
+    }
   } catch (e) {
     if (kDebugMode) {
       print('Error securing app: $e');
