@@ -1,16 +1,19 @@
 # daaymn
 
-A new Flutter project.
+Flutter dating app (Supabase + Firebase backend).
 
-## Getting Started
+## Demo-data mode (for screenshots and clips)
 
-This project is a starting point for a Flutter application.
+Runs the key screens (Discover cards, match pop-up, chat, Daaymn Score, vibe picker) on made-up
+people with AI-generated photos, labelled "Demo profiles". No Supabase/Firebase login, nothing is
+written anywhere. The photos load from the public `seed-photos/ai` bucket (set
+`--dart-define=DEMO_PHOTO_BASE=<url>` in `tool/run_demo.sh` to point elsewhere).
 
-A few resources to get you started if this is your first Flutter project:
+Start it (first build takes a minute or two):
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+    tool/run_demo.sh            # serves on http://127.0.0.1:8099
+    tool/run_demo.sh 9000       # or pick a port
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Address: **http://127.0.0.1:8099**. Capture with `symbiot capture Daaymn --url http://127.0.0.1:8099`.
+Tap the heart on a card for the match pop-up; "Say hi" opens the chat; the bottom bar has
+Matches, Daaymn Score and Vibe.
