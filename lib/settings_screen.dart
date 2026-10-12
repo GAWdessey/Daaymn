@@ -5,6 +5,7 @@ import 'package:daaymn/main.dart';
 import 'package:daaymn/polls_screen.dart';
 import 'package:daaymn/push_notification_service.dart';
 import 'package:daaymn/report_problem_screen.dart';
+import 'package:daaymn/services/invite_service.dart';
 import 'package:daaymn/services/promo_code_service.dart';
 import 'package:daaymn/services/service_locator.dart';
 import 'package:daaymn/theme_provider.dart';
@@ -568,6 +569,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             title: const Text('Notification Settings'),
                             leading: const Icon(Icons.notifications_outlined),
                             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationSettingsScreen())),
+                          ),
+                          const Divider(),
+                          _buildSectionHeader('Invite'),
+                          ListTile(
+                            title: const Text('Invite a friend on WhatsApp'),
+                            subtitle: const Text('Sends them a link to get Daaymn'),
+                            leading: const Icon(Icons.chat_outlined, color: Colors.green),
+                            onTap: InviteService.inviteViaWhatsApp,
                           ),
                           const Divider(),
                           _buildSectionHeader('Support & Legal'),

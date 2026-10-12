@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:daaymn/globals.dart';
 import 'package:daaymn/in_app_purchase_service.dart';
+import 'package:daaymn/services/invite_service.dart';
 import 'package:daaymn/services/report_service.dart';
 import 'package:daaymn/widgets/daaymn_loading_dialog.dart';
 import 'package:flutter/material.dart';
@@ -459,7 +460,18 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
       return const Center(child: CircularProgressIndicator(color: Colors.white));
     }
     if (_unlockedTier == ReportTier.free) {
-      return _buildShareableCard();
+      return Column(
+        children: [
+          _buildShareableCard(),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.share),
+            label: const Text('Share Card'),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black),
+            onPressed: _shareDaaymnScore,
+          ),
+        ],
+      );
     }
 
     // This widget is a simple column, designed to be placed in a SingleChildScrollView.
@@ -1167,7 +1179,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
         final file = await File('${tempDir.path}/DaaymnScore_Badge.png').create();
         await file.writeAsBytes(pngBytes);
 
-        await Share.shareXFiles([XFile(file.path, mimeType: 'image/png')], text: 'This is my verified DaaymnScore: ${_reportData!.daaymnScore}/10. What\'s yours? #DaaymnScore');
+        await Share.shareXFiles([XFile(file.path, mimeType: 'image/png')], text: InviteService.scoreShareText(_reportData!.daaymnScore));
 
       } catch (e) {
         if (mounted) {
