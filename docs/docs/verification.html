@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daaymn Verification</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+body { margin:0; font-family:'Inter',sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; background: linear-gradient(to bottom right,#FC00FF,#00DBDE); color:#fff; text-align:center;}
+h1 { font-family:'Pacifico',cursive; font-size:48px; margin-bottom:24px; }
+.container { max-width:400px; padding: 20px; }
+</style>
+<script>
+window.onload = function() {
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get('type');
+    const token = params.get('access_token');
+
+
+
+
+    if (type === 'recovery' && token) {
+        const appUrl = `com.daaymn.app://reset-password?type=recovery&access_token=${token}`;
+        document.getElementById('message').innerText = 'Opening Daaymn to reset your password...';
+        window.location.replace(appUrl);
+    } else if (type === 'signup') {
+        const appUrl = `com.daaymn.app://auth-callback?access_token=${token}`;
+        document.getElementById('message').innerText = 'Opening Daaymn to confirm your email...';
+
+
+
+
+
+
+
+
+
+        window.location.replace(appUrl);
+    } else {
+        document.getElementById('message').innerText = 'Invalid or expired link. Please return to the app and request a new one.';
+    }
+};
+</script>
+</head>
+<body>
+<div class="container">
+<h1>Daaymn</h1>
+<p id="message">Please wait, processing your request...</p>
+</div>
+</body>
+</html>
