@@ -274,4 +274,41 @@ void main() {
     expect(find.text('Profile saved.'), findsOneWidget);
     await tester.pump(const Duration(seconds: 3));
   });
+
+  testWidgets('profile at 390: photo buttons take a tap outside the circle', (
+    tester,
+  ) async {
+    await open(tester, '/profile');
+    tester.view.physicalSize = const Size(390, 844);
+    await tester.pump();
+    tester.takeException();
+
+    List<String> urls() => tester
+        .widgetList<Image>(find.byType(Image))
+        .map((i) => i.image)
+        .whereType<NetworkImage>()
+        .map((n) => n.url)
+        .toList();
+
+    // The 28 px circles sit 8 px in from the photo's corners.
+    final photo = tester.getRect(find.byType(Image).first);
+    final remove = tester.getRect(find.byTooltip('Remove photo').first);
+    expect(remove.size, const Size(44, 44));
+    expect(remove.topRight, photo.topRight);
+    final move = tester.getRect(find.byTooltip('Move earlier').first);
+    expect(move.size, const Size(44, 44));
+
+    // 3 px inside each hit area's corner is outside its circle.
+    final before = urls();
+    await tester.tapAt(move.bottomLeft + const Offset(3, -3));
+    await tester.pump();
+    tester.takeException();
+    expect(urls(), [before[1], before[0], ...before.sublist(2)]);
+
+    await tester.tapAt(remove.topRight + const Offset(-3, 3));
+    await tester.pump();
+    tester.takeException();
+    expect(find.byIcon(Icons.add), findsNWidgets(4));
+    expect(urls(), [before[0], ...before.sublist(2)]);
+  });
 }
