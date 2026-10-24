@@ -14,6 +14,10 @@ class ProfileCard extends StatelessWidget {
   final GlobalKey? dislikeKey;
   final GlobalKey? dislikeCounterKey;
   final GlobalKey? verifiedBadgeKey;
+  final double aspectRatio;
+  final Widget? extraAction; // drawn left of the dislike button
+  // Zero draws the photo at full strength at once, with no cross-fade from the placeholder.
+  final Duration imageFadeIn;
 
   const ProfileCard({
     super.key,
@@ -26,11 +30,16 @@ class ProfileCard extends StatelessWidget {
     this.dislikeKey,
     this.dislikeCounterKey,
     this.verifiedBadgeKey,
+    this.aspectRatio = 4 / 5,
+    this.extraAction,
+    this.imageFadeIn = const Duration(milliseconds: 500),
   });
 
   @override
   Widget build(BuildContext context) {
-    final bool isOnline = profile.lastSeen != null && DateTime.now().difference(profile.lastSeen!).inMinutes < 5;
+    final bool isOnline =
+        profile.lastSeen != null &&
+        DateTime.now().difference(profile.lastSeen!).inMinutes < 5;
 
     return GestureDetector(
       onTap: onTap,
@@ -40,33 +49,49 @@ class ProfileCard extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         clipBehavior: Clip.antiAlias,
         child: AspectRatio(
-          aspectRatio: 4 / 5, // This gives the card a fixed size, preventing the crash.
+          aspectRatio:
+              aspectRatio, // This gives the card a fixed size, preventing the crash.
           child: Stack(
             children: [
               // Full-card background image
               Positioned.fill(
-                child: (profile.imageUrl != null && profile.imageUrl!.isNotEmpty)
+                child:
+                    (profile.imageUrl != null && profile.imageUrl!.isNotEmpty)
                     ? CachedNetworkImage(
                         imageUrl: profile.imageUrl!,
                         memCacheWidth: 1080,
+                        fadeInDuration: imageFadeIn,
+                        fadeOutDuration: imageFadeIn, // the placeholder's fade
                         fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(color: Colors.grey[800]),
+                        placeholder: (context, url) =>
+                            Container(color: Colors.grey[800]),
                         errorWidget: (context, url, error) => Container(
                           color: Colors.grey[800],
-                          child: const Icon(Icons.person, size: 80, color: Colors.white30),
+                          child: const Icon(
+                            Icons.person,
+                            size: 80,
+                            color: Colors.white30,
+                          ),
                         ),
                       )
                     : Container(
-                  color: Colors.grey[800],
-                  child: const Icon(Icons.person, size: 80, color: Colors.white30),
-                ),
+                        color: Colors.grey[800],
+                        child: const Icon(
+                          Icons.person,
+                          size: 80,
+                          color: Colors.white30,
+                        ),
+                      ),
               ),
               // Protective gradient for text readability
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Colors.transparent, Colors.black.withValues(alpha: 0.8)],
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: 0.8),
+                      ],
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       stops: const [0.5, 1.0],
@@ -87,18 +112,25 @@ class ProfileCard extends StatelessWidget {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          if (isOnline) const Padding(
-                            padding: EdgeInsets.only(right: 8.0),
-                            child: OnlineIndicator(size: 12),
-                          ),
+                          if (isOnline)
+                            const Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: OnlineIndicator(size: 12),
+                            ),
                           Flexible(
                             child: Text(
                               '${profile.name}, ${profile.age}',
-                              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                shadows: [const Shadow(blurRadius: 2, color: Colors.black54)],
-                              ),
+                              style: Theme.of(context).textTheme.headlineMedium
+                                  ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    shadows: [
+                                      const Shadow(
+                                        blurRadius: 2,
+                                        color: Colors.black54,
+                                      ),
+                                    ],
+                                  ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -109,17 +141,31 @@ class ProfileCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      if (profile.jobTitle != null && profile.jobTitle!.isNotEmpty)
+                      if (profile.jobTitle != null &&
+                          profile.jobTitle!.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 4.0),
                           child: Row(
                             children: [
-                              const Icon(Icons.work_outline, color: Colors.white70, size: 16),
+                              const Icon(
+                                Icons.work_outline,
+                                color: Colors.white70,
+                                size: 16,
+                              ),
                               const SizedBox(width: 8),
                               Flexible(
                                 child: Text(
                                   profile.jobTitle!,
-                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white, shadows: [const Shadow(blurRadius: 1, color: Colors.black87)]),
+                                  style: Theme.of(context).textTheme.bodyLarge
+                                      ?.copyWith(
+                                        color: Colors.white,
+                                        shadows: [
+                                          const Shadow(
+                                            blurRadius: 1,
+                                            color: Colors.black87,
+                                          ),
+                                        ],
+                                      ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
@@ -132,44 +178,53 @@ class ProfileCard extends StatelessWidget {
                           child: Wrap(
                             spacing: 8.0,
                             runSpacing: 8.0,
-                            children: profile.interests.take(3).map((interest) => _buildInterestPill(interest)).toList(),
+                            children: profile.interests
+                                .take(3)
+                                .map((interest) => _buildInterestPill(interest))
+                                .toList(),
                           ),
                         ),
-                      const SizedBox(height: 50), // Space for action buttons
+                      // Actions get their own row under the chips, so nothing overlaps.
+                      if (onLike != null && onDislike != null) ...[
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            if (extraAction != null) ...[
+                              extraAction!,
+                              const SizedBox(width: 12),
+                            ],
+                            KeyedSubtree(
+                              key: dislikeKey,
+                              child: _buildActionButton(
+                                icon: Icons.close,
+                                color: Colors.white,
+                                backgroundColor: Colors.red.withValues(
+                                  alpha: 0.9,
+                                ),
+                                onPressed: onDislike!,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            KeyedSubtree(
+                              key: likeKey,
+                              child: _buildActionButton(
+                                icon: Icons.favorite,
+                                color: Colors.white,
+                                backgroundColor: Colors.pinkAccent.withValues(
+                                  alpha: 0.9,
+                                ),
+                                onPressed: onLike!,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ),
               ),
-
-              // Dislike/Like action buttons
-              if (onLike != null && onDislike != null)
-                Positioned(
-                  bottom: 16,
-                  right: 16,
-                  child: Row(
-                    children: [
-                      KeyedSubtree(
-                        key: dislikeKey,
-                        child: _buildActionButton(
-                          icon: Icons.close,
-                          color: Colors.white,
-                          backgroundColor: Colors.red.withValues(alpha: 0.9),
-                          onPressed: onDislike!,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      KeyedSubtree(
-                        key: likeKey,
-                        child: _buildActionButton(
-                          icon: Icons.favorite,
-                          color: Colors.white,
-                          backgroundColor: Colors.pinkAccent.withValues(alpha: 0.9),
-                          onPressed: onLike!,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
 
               // Dislike counter (if applicable)
               if (dislikeCount != null && dislikeCount! > 0)
@@ -179,18 +234,29 @@ class ProfileCard extends StatelessWidget {
                   child: KeyedSubtree(
                     key: dislikeCounterKey,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black.withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.thumb_down, color: Colors.red, size: 16),
+                          const Icon(
+                            Icons.thumb_down,
+                            color: Colors.red,
+                            size: 16,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             dislikeCount.toString(),
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
                           ),
                         ],
                       ),
@@ -210,11 +276,18 @@ class ProfileCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 1),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.5),
+          width: 1,
+        ),
       ),
       child: Text(
         interest,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 12),
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w500,
+          fontSize: 12,
+        ),
       ),
     );
   }
@@ -225,19 +298,56 @@ class ProfileCard extends StatelessWidget {
     required Color backgroundColor,
     required VoidCallback onPressed,
   }) {
-    return Material(
-      color: backgroundColor,
-      shape: const CircleBorder(),
-      elevation: 4,
-      shadowColor: Colors.black,
-      child: InkWell(
-        onTap: onPressed,
-        customBorder: const CircleBorder(),
-        splashColor: color.withValues(alpha: 0.3),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Icon(icon, color: color, size: 32),
+    return _FocusRing(
+      child: Material(
+        color: backgroundColor,
+        shape: const CircleBorder(),
+        elevation: 4,
+        shadowColor: Colors.black,
+        child: InkWell(
+          onTap: onPressed,
+          customBorder: const CircleBorder(),
+          splashColor: color.withValues(alpha: 0.3),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Icon(icon, color: color, size: 32),
+          ),
         ),
+      ),
+    );
+  }
+}
+
+/// A 2 px accent ring around [child] while it (or a descendant) has keyboard focus.
+class _FocusRing extends StatefulWidget {
+  final Widget child;
+  const _FocusRing({required this.child});
+
+  @override
+  State<_FocusRing> createState() => _FocusRingState();
+}
+
+class _FocusRingState extends State<_FocusRing> {
+  bool _focused = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      canRequestFocus: false,
+      skipTraversal: true,
+      onFocusChange: (f) => setState(() => _focused = f),
+      child: DecoratedBox(
+        position: DecorationPosition.foreground,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: _focused
+                ? Theme.of(context).colorScheme.primary
+                : Colors.transparent,
+            width: 2,
+          ),
+        ),
+        child: widget.child,
       ),
     );
   }
