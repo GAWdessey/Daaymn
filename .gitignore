@@ -52,3 +52,7 @@ service-account.json
 
 # Screenshot test account credentials (supabase/scripts/test_account.py)
 .test-account.env
+
+# Symbiot: keep design specs, ignore run files
+.symbiot/*
+!.symbiot/design/
