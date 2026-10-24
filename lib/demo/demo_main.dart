@@ -1594,15 +1594,17 @@ class _DemoProfileEditorState extends State<DemoProfileEditor> {
           borderRadius: BorderRadius.circular(12),
           child: Image.network(url, fit: BoxFit.cover),
         ),
+        // The 44x44 hit area sits flush in the corner, so its centred
+        // 28 px circle shows 8 px in from the photo's edges.
         Positioned(
-          top: 4,
-          right: 4,
+          top: 0,
+          right: 0,
           child: _chip(Icons.close, 'Remove photo', () => _remove(i)),
         ),
         if (i > 0)
           Positioned(
-            bottom: 4,
-            left: 4,
+            bottom: 0,
+            left: 0,
             child: _chip(
               Icons.arrow_back,
               'Move earlier',
@@ -1613,15 +1615,30 @@ class _DemoProfileEditorState extends State<DemoProfileEditor> {
     );
   }
 
-  Widget _chip(IconData icon, String tip, VoidCallback onTap) => SizedBox(
-    width: 28,
-    height: 28,
-    child: IconButton.filled(
-      tooltip: tip,
-      padding: EdgeInsets.zero,
-      style: IconButton.styleFrom(backgroundColor: Colors.black54),
-      onPressed: onTap,
-      icon: Icon(icon, size: 16, color: Colors.white),
+  Widget _chip(IconData icon, String tip, VoidCallback onTap) => Tooltip(
+    message: tip,
+    child: Semantics(
+      button: true,
+      label: tip,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: SizedBox(
+          width: 44,
+          height: 44,
+          child: Center(
+            child: Container(
+              width: 28,
+              height: 28,
+              decoration: const BoxDecoration(
+                color: Colors.black54,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 16, color: Colors.white),
+            ),
+          ),
+        ),
+      ),
     ),
   );
 }
