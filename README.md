@@ -14,6 +14,17 @@ Start it (first build takes a minute or two):
     tool/run_demo.sh            # serves on http://127.0.0.1:8099
     tool/run_demo.sh 9000       # or pick a port
 
-Address: **http://127.0.0.1:8099**. Capture with `symbiot capture Daaymn --url http://127.0.0.1:8099`.
-Tap the heart on a card for the match pop-up; "Say hi" opens the chat; the bottom bar has
-Matches, Daaymn Score and Vibe.
+Each key screen has its own address:
+
+| Address | Screen |
+|---|---|
+| `/` | Discover: faces to browse |
+| `/match` | The match pop-up |
+| `/chat` | A chat with a match |
+| `/score` | Daaymn Score |
+| `/vibe` | Vibe picker |
+| `/matches` | Matches list |
+
+Capture the Play-listing set, in listing order:
+`symbiot capture Daaymn --url http://127.0.0.1:8099 --screens /match,/chat,/score,/vibe`
+(capture always takes `/` first).
