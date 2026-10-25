@@ -9,6 +9,17 @@ import 'package:flutter/material.dart';
 import 'package:pointycastle/export.dart' as pc;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+/// People who liked me and still need an answer: the same set the Liked You
+/// screen lists, so the tab badge never shows a number the screen can't back up.
+@visibleForTesting
+int countLikedYou({
+  required Set<String> whoLikedMe,
+  required Set<String> allMyLikes,
+  required Set<String> myDislikes,
+  required Set<String> blocked,
+}) =>
+    whoLikedMe.difference(allMyLikes).difference(myDislikes).difference(blocked).length;
+
 class NotificationProvider extends ChangeNotifier {
   int _yourLikesCount = 0;
   int _likedYouCount = 0;
@@ -77,12 +88,12 @@ class NotificationProvider extends ChangeNotifier {
     }
 
     try {
-      final threeDaysAgo = DateTime.now().subtract(const Duration(days: 3)).toIso8601String();
+      final threeDaysAgo = DateTime.now().toUtc().subtract(const Duration(days: 3));
 
       final responses = await Future.wait([
         supabase.from('blocks').select('blocked_id').eq('blocker_id', currentUserId),
         supabase.from('blocks').select('blocker_id').eq('blocked_id', currentUserId),
-        supabase.from('likes').select('liked_user_id').eq('user_id', currentUserId).gte('created_at', threeDaysAgo),
+        supabase.from('likes').select('liked_user_id, created_at').eq('user_id', currentUserId),
         supabase.from('likes').select('user_id').eq('liked_user_id', currentUserId),
         supabase.from('dislikes').select('disliked_user_id').eq('user_id', currentUserId),
         supabase.from('messages').count().eq('receiver_id', currentUserId).eq('is_read', false).eq('is_otm', false),
@@ -93,7 +104,14 @@ class NotificationProvider extends ChangeNotifier {
       final whoBlockedMe = (responses[1] as List).map((e) => e['blocker_id'].toString()).toSet();
       final allBlockedUsers = iHaveBlocked.union(whoBlockedMe);
 
-      final myLikes = (responses[2] as List).map((e) => e['liked_user_id'].toString()).toSet();
+      // The Liked You screen treats anyone I have ever liked as already handled,
+      // so its badge must too; only Your Likes is limited to the last 3 days.
+      final myLikeRows = responses[2] as List;
+      final allMyLikes = myLikeRows.map((e) => e['liked_user_id'].toString()).toSet();
+      final myLikes = myLikeRows
+          .where((e) => DateTime.parse(e['created_at'].toString()).isAfter(threeDaysAgo))
+          .map((e) => e['liked_user_id'].toString())
+          .toSet();
       final whoLikedMe = (responses[3] as List).map((e) => e['user_id'].toString()).toSet();
       final myDislikes = (responses[4] as List).map((e) => e['disliked_user_id'].toString()).toSet();
       
@@ -103,7 +121,12 @@ class NotificationProvider extends ChangeNotifier {
       final matches = myLikes.intersection(whoLikedMe);
 
       _yourLikesCount = myLikes.difference(matches).difference(allBlockedUsers).length;
-      _likedYouCount = whoLikedMe.difference(matches).difference(myDislikes).difference(allBlockedUsers).length;
+      _likedYouCount = countLikedYou(
+        whoLikedMe: whoLikedMe,
+        allMyLikes: allMyLikes,
+        myDislikes: myDislikes,
+        blocked: allBlockedUsers,
+      );
       _messagesCount = unreadMessagesCount + unreadOtmsCount; 
 
     } catch (e) {
