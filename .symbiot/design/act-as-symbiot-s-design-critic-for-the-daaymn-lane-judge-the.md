@@ -41,6 +41,22 @@ Click-through flows go in Chrome over DevTools, as in the last review. For each 
 report says **present / missing / broken**, and for missing or broken it says what it should be.
 
 **Verdict 1: addresses and capture (judged in this round)**
+Every screen of the demo and its own address (from `_Start.of` in `lib/demo/demo_main.dart`):
+
+| Screen | Address |
+|---|---|
+| Discover (first card) | `/` and `/discover` |
+| First use | `/welcome` |
+| Discover, end of deck | `/discover/empty` |
+| Match pop-up | `/match` |
+| Matches list | `/matches` |
+| Matches, none yet | `/matches/empty` |
+| Chat | `/chat` |
+| Score | `/score` |
+| Vibe | `/vibe` |
+| Profile | `/profile` |
+| Anything else (e.g. `/nope`) | shows Discover, address bar reads `/` |
+
 1. **Direct open:** each address shows its screen on the first picture, photos in full, with no
    grey card, no fade and no black card behind the pop-up. `/nope` shows Discover and the
    address bar reads `/`.
@@ -65,7 +81,7 @@ and what to write as the fix. The critic confirms each one on a screenshot befor
 | Match | Present (`/match`) | Leave as is. |
 | Undo | Missing | A small ↶ button to the left of ✕ on the card (40 px, grey outline). After a pass it brings back the last card; with nothing to undo it's greyed out. Toast: "Brought back Alex." |
 | Empty: end of deck | Missing: after Ethan the last card just stays | Centred in the Discover body: a heart outline (64 px, muted), **"You've seen everyone for now"**, "New people show up every day.", and the button **See your matches** → `/matches`. Gets its own address, `/discover/empty`. |
-| Empty: no matches | Missing | "No matches yet", "Like someone on Discover and they'll show up here.", button **Start browsing**. |
+| Empty: no matches | Missing | At `/matches/empty`: "No matches yet", "Like someone on Discover and they'll show up here.", button **Start browsing**. |
 | Matches list | Present, but Fiona's preview reads "Coffee after? I know a place.", which is *your* message, not her last one | Preview shows the last message, prefixed with "You: " when it's yours: Fiona → "Daaymn, you had me at coffee." Grace and Hannah sit in a "New matches" row of avatars above "Messages". |
 | Chat | Present, but the input is disabled, there's no send button, and "Say hi" to Hannah opens Fiona's script | Input enabled, with a send icon button (40 px, accent). Sending appends a right-hand bubble and clears the field; Enter sends. A new match (Hannah, Grace) opens to an empty chat: their avatar at 64 px, "You matched with Hannah today.", and the hint "Say something about her photos". |
 | Profile edit | Missing | A fifth tab, **Profile** (`/profile`): your photo grid of 6 slots (add, remove, reorder), name and age, job, a "My vibes" row linking to `/vibe`, and **Save**. Vibe's "They show on your profile card" then has somewhere to point. |
