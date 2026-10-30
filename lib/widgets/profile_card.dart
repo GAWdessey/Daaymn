@@ -1,4 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cached_network_image_platform_interface/cached_network_image_platform_interface.dart'
+    show ImageRenderMethodForWeb;
 import 'package:daaymn/globals.dart';
 import 'package:daaymn/widgets/online_indicator.dart';
 import 'package:daaymn/widgets/verified_badge.dart';
@@ -18,6 +20,9 @@ class ProfileCard extends StatelessWidget {
   final Widget? extraAction; // drawn left of the dislike button
   // Zero draws the photo at full strength at once, with no cross-fade from the placeholder.
   final Duration imageFadeIn;
+  // How the photo is fetched on web. The web demo uses HttpGet: a photo decoded by the
+  // browser (HtmlImage) can paint black when its card is drawn a second time.
+  final ImageRenderMethodForWeb imageRenderMethodForWeb;
 
   const ProfileCard({
     super.key,
@@ -33,6 +38,7 @@ class ProfileCard extends StatelessWidget {
     this.aspectRatio = 4 / 5,
     this.extraAction,
     this.imageFadeIn = const Duration(milliseconds: 500),
+    this.imageRenderMethodForWeb = ImageRenderMethodForWeb.HtmlImage,
   });
 
   @override
@@ -60,6 +66,7 @@ class ProfileCard extends StatelessWidget {
                     ? CachedNetworkImage(
                         imageUrl: profile.imageUrl!,
                         memCacheWidth: 1080,
+                        imageRenderMethodForWeb: imageRenderMethodForWeb,
                         fadeInDuration: imageFadeIn,
                         fadeOutDuration: imageFadeIn, // the placeholder's fade
                         fit: BoxFit.cover,

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:daaymn/demo/demo_data.dart';
 import 'package:daaymn/demo/demo_main.dart';
 import 'package:daaymn/widgets/profile_card.dart';
 import 'package:flutter/material.dart';
@@ -259,11 +260,11 @@ void main() {
   testWidgets('profile tab: remove a photo, save', (tester) async {
     await open(tester, '/profile');
     expect(find.text('YOUR PHOTOS'), findsOneWidget);
-    expect(find.byIcon(Icons.add), findsNWidgets(3));
+    expect(find.byIcon(Icons.add), findsNWidgets(4));
     await tester.tap(find.byTooltip('Remove photo').first);
     await tester.pump();
     tester.takeException();
-    expect(find.byIcon(Icons.add), findsNWidgets(4));
+    expect(find.byIcon(Icons.add), findsNWidgets(5));
     await tester.scrollUntilVisible(
       find.text('Save'),
       200,
@@ -308,7 +309,58 @@ void main() {
     await tester.tapAt(remove.topRight + const Offset(-3, 3));
     await tester.pump();
     tester.takeException();
-    expect(find.byIcon(Icons.add), findsNWidgets(4));
+    expect(find.byIcon(Icons.add), findsNWidgets(5));
     expect(urls(), [before[0], ...before.sublist(2)]);
+  });
+
+  testWidgets('profile: Add puts in Sam\'s own photo; Remove closes the gap', (
+    tester,
+  ) async {
+    await open(tester, '/profile');
+    List<String> urls() => tester
+        .widgetList<Image>(find.byType(Image))
+        .map((i) => i.image)
+        .whereType<NetworkImage>()
+        .map((n) => n.url)
+        .toList();
+    expect(urls(), demoMyPhotos);
+
+    await tester.tap(find.byIcon(Icons.add).last); // any empty slot
+    await tester.pump();
+    tester.takeException();
+    expect(urls(), demoMyAllPhotos);
+
+    // Remove the first: the other two move up, and the empty slots stay at the end.
+    await tester.tap(find.byTooltip('Remove photo').first);
+    await tester.pump();
+    tester.takeException();
+    expect(urls(), demoMyAllPhotos.sublist(1));
+    final lastPhoto = tester.getRect(find.byType(Image).last);
+    final firstEmpty = tester.getRect(find.byIcon(Icons.add).first);
+    expect(firstEmpty.left, greaterThan(lastPhoto.right));
+    expect(firstEmpty.top, lessThan(lastPhoto.bottom));
+  });
+
+  test('the Discover deck and the matches never show Sam\'s own photos', () {
+    final others = {
+      for (final p in [...demoDiscover, ...demoMatches]) ...p.imageUrls,
+    };
+    expect(others.intersection(demoMyAllPhotos.toSet()), isEmpty);
+  });
+
+  testWidgets('a chat opened at /chat reads as read back on the list', (
+    tester,
+  ) async {
+    await open(tester, '/chat');
+    await tester.enterText(find.byType(TextField), 'Coffee sounds perfect.');
+    await tester.tap(find.byIcon(Icons.send));
+    await tester.pump();
+    tester.takeException();
+    await tester.tap(find.byType(BackButton));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    tester.takeException();
+    expect(find.text('You: Coffee sounds perfect.'), findsOneWidget);
+    expect(find.byKey(const ValueKey('unread-dot')), findsOneWidget); // David's only
   });
 }

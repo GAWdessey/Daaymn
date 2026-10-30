@@ -60,7 +60,6 @@ final demoDiscover = <Profile>[
     'Podcasts',
     'Cooking',
   ], verified: true),
-  _person('chris', 'Chris', 31, 'Architect', ['Hiking', 'Jazz', 'Coffee']),
   _person('ethan', 'Ethan', 29, 'Pastry chef', ['Baking', 'Travel', 'Cinema']),
 ];
 
@@ -91,14 +90,13 @@ final demoMatches = <Profile>[
 /// Only a like on one of these people is a match; every other like just moves on.
 const demoMutualIds = {'demo-jessica'};
 
-/// The demo user's own profile: first photos filled, spare ones to add from.
+/// The demo user's own profile. Sam wears the "chris" photo set, which nobody in the
+/// deck or the matches uses; he starts with two of its three photos, and Add puts in his own.
 const demoMyName = 'Sam';
 const demoMyAge = 29;
 const demoMyJob = 'Product designer';
-final demoMyPhotos = [for (var i = 1; i <= 3; i++) demoPhoto('chris', i)];
-final demoSparePhotos = [
-  for (final k in ['ben', 'alex', 'ethan']) demoPhoto(k, 2),
-];
+final demoMyAllPhotos = [for (var i = 1; i <= 3; i++) demoPhoto('chris', i)];
+final demoMyPhotos = demoMyAllPhotos.take(2).toList();
 
 class DemoMessage {
   final bool mine;
