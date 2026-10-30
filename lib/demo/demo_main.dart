@@ -4,6 +4,8 @@ import 'package:daaymn/demo/demo_data.dart';
 import 'package:daaymn/globals.dart';
 import 'package:daaymn/widgets/profile_card.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cached_network_image_platform_interface/cached_network_image_platform_interface.dart'
+    show ImageRenderMethodForWeb;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -54,7 +56,7 @@ Future<void> precacheDemoPhotos() async {
       ResizeImage.resizeIfNeeded(
         1080,
         null,
-        CachedNetworkImageProvider(demoDiscover.first.imageUrl!),
+        demoImage(demoDiscover.first.imageUrl!),
       ),
     ),
     for (final p in demoDiscover.skip(1))
@@ -62,13 +64,13 @@ Future<void> precacheDemoPhotos() async {
         ResizeImage.resizeIfNeeded(
           1080,
           null,
-          CachedNetworkImageProvider(p.imageUrl!),
+          demoImage(p.imageUrl!),
         ),
       ),
     for (final p in demoMatches) load(NetworkImage(p.imageUrl!)),
     // The full-screen match shows your photo next to theirs.
     for (final url in [demoMyPhotos.first, demoMatchPopup.imageUrl!])
-      load(CachedNetworkImageProvider(url)),
+      load(demoImage(url)),
     // The verified badge is an SVG asset; load it now so it is drawn with the first card.
     () async {
       const badge = SvgAssetLoader('assets/images/daaymnv.svg');
@@ -79,6 +81,13 @@ Future<void> precacheDemoPhotos() async {
     }(),
   ]);
 }
+
+/// A demo photo fetched as bytes (HttpGet). The browser-decoded default (HtmlImage) paints
+/// black when a card is drawn a second time: after Undo, or behind the match pop-up.
+CachedNetworkImageProvider demoImage(String url) => CachedNetworkImageProvider(
+  url,
+  imageRenderMethodForWeb: ImageRenderMethodForWeb.HttpGet,
+);
 
 const _tabPaths = ['/discover', '/matches', '/score', '/vibe', '/profile'];
 
@@ -226,6 +235,7 @@ class DemoStore extends ChangeNotifier {
   void send(Profile p, String text) {
     chats[p.id] = [...chatOf(p), DemoMessage(true, text)];
     times[p.id] = 'Now';
+    unread.remove(p.id); // your line is the last one, so the thread reads as read
     notifyListeners();
   }
 
@@ -511,11 +521,20 @@ class _DemoDiscoverState extends State<DemoDiscover> {
         SnackBar(
           content: Text('Brought back ${back.name}.'),
           duration: const Duration(seconds: 2),
+          // Floats at the top of the card, clear of the chips and the undo, pass and like row.
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.fromLTRB(
+            32,
+            0,
+            32,
+            ((context.size?.height ?? 0) - 88).clamp(112, double.infinity),
+          ),
         ),
       );
   }
 
   void _showMatch(Profile who) {
+    _setAddress('/match');
     Navigator.of(context).push(
       PageRouteBuilder<void>(
         opaque: true,
@@ -588,6 +607,7 @@ class _DemoDiscoverState extends State<DemoDiscover> {
                     onLike: () => _swipe(store, like: true),
                     onDislike: () => _swipe(store, like: false),
                     imageFadeIn: Duration.zero,
+                    imageRenderMethodForWeb: ImageRenderMethodForWeb.HttpGet,
                     extraAction: _UndoButton(
                       onPressed: store.passed.isEmpty
                           ? null
@@ -630,7 +650,7 @@ class _MatchScreen extends StatelessWidget {
             BoxShadow(color: Color(0x40000000), blurRadius: 16),
           ],
           image: DecorationImage(
-            image: CachedNetworkImageProvider(url),
+            image: demoImage(url),
             fit: BoxFit.cover,
           ),
           color: Colors.white24,
@@ -1096,6 +1116,15 @@ class _DemoChatState extends State<DemoChat> {
   final _text = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // Opened from any route (the list, /chat, Say hi): the thread is read now.
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _StoreScope.of(context).markRead(widget.profile),
+    );
+  }
+
+  @override
   void dispose() {
     _text.dispose();
     super.dispose();
@@ -1464,17 +1493,30 @@ class _DemoProfileEditorState extends State<DemoProfileEditor> {
     super.dispose();
   }
 
-  void _add(int slot) {
-    final used = _store.photos.whereType<String>().toSet();
-    final next =
-        demoSparePhotos.where((u) => !used.contains(u)).firstOrNull ??
-        demoSparePhotos[slot % demoSparePhotos.length];
-    _store.photos[slot] = next;
+  /// Fills the first empty slot with one of Sam's own photos not shown yet; never a repeat.
+  void _add() {
+    final p = _store.photos;
+    final next = demoMyAllPhotos.where((u) => !p.contains(u)).firstOrNull;
+    if (next == null) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text("That's all your photos for now."),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      return;
+    }
+    p[p.indexOf(null)] = next;
     _store.changed();
   }
 
+  /// Takes the photo out and closes the gap, so empty slots stay at the end.
   void _remove(int slot) {
-    _store.photos[slot] = null;
+    _store.photos
+      ..removeAt(slot)
+      ..add(null);
     _store.changed();
   }
 
@@ -1576,7 +1618,7 @@ class _DemoProfileEditorState extends State<DemoProfileEditor> {
     final url = store.photos[i];
     if (url == null) {
       return InkWell(
-        onTap: () => _add(i),
+        onTap: _add,
         borderRadius: BorderRadius.circular(12),
         child: Ink(
           decoration: BoxDecoration(
