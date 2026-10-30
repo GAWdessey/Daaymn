@@ -521,6 +521,14 @@ class _DemoDiscoverState extends State<DemoDiscover> {
         SnackBar(
           content: Text('Brought back ${back.name}.'),
           duration: const Duration(seconds: 2),
+          // Floats at the top of the card, clear of the chips and the undo, pass and like row.
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.fromLTRB(
+            32,
+            0,
+            32,
+            ((context.size?.height ?? 0) - 88).clamp(112, double.infinity),
+          ),
         ),
       );
   }
@@ -1485,13 +1493,21 @@ class _DemoProfileEditorState extends State<DemoProfileEditor> {
     super.dispose();
   }
 
-  /// Fills the first empty slot with one of Sam's own photos, one not shown yet if any.
+  /// Fills the first empty slot with one of Sam's own photos not shown yet; never a repeat.
   void _add() {
     final p = _store.photos;
-    final used = p.whereType<String>().toSet();
-    final next =
-        demoMyAllPhotos.where((u) => !used.contains(u)).firstOrNull ??
-        demoMyAllPhotos[used.length % demoMyAllPhotos.length];
+    final next = demoMyAllPhotos.where((u) => !p.contains(u)).firstOrNull;
+    if (next == null) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text("That's all your photos for now."),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      return;
+    }
     p[p.indexOf(null)] = next;
     _store.changed();
   }

@@ -330,6 +330,14 @@ void main() {
     tester.takeException();
     expect(urls(), demoMyAllPhotos);
 
+    // All three are in: Add says so and repeats none.
+    await tester.tap(find.byIcon(Icons.add).first);
+    await tester.pump();
+    tester.takeException();
+    expect(urls(), demoMyAllPhotos);
+    expect(find.text("That's all your photos for now."), findsOneWidget);
+    await tester.pump(const Duration(seconds: 3));
+
     // Remove the first: the other two move up, and the empty slots stay at the end.
     await tester.tap(find.byTooltip('Remove photo').first);
     await tester.pump();
