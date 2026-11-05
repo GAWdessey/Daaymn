@@ -11,7 +11,8 @@ class PushNotificationService with WidgetsBindingObserver {
   static final PushNotificationService _instance = PushNotificationService._internal();
   factory PushNotificationService() => _instance;
 
-  final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+  // Looked up on use, so a build without Firebase (the web build) can still make this.
+  FirebaseMessaging get _fcm => FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   bool _initialized = false;

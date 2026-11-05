@@ -59,14 +59,19 @@ Future<void> main() async {
 
   // --- THIS IS THE FIX: Get the link before running the app ---
   final appLinks = AppLinks();
-  final initialUri = await appLinks.getInitialLink();
+  // On web the "initial link" is just the page's own address, not a deep link.
+  final initialUri = kIsWeb ? null : await appLinks.getInitialLink();
   if (kDebugMode) {
     print('[DEEP_LINK_LOG] main(): The initial link is: $initialUri');
   }
   // ---------------------------------------------------------
 
-  await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  // Firebase (push) is set up for Android only; the web build, used to review and
+  // screenshot the real screens, runs without it.
+  if (!kIsWeb) {
+    await Firebase.initializeApp();
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  }
 
   try {
     // Marketing builds pass --dart-define=ALLOW_SCREEN_RECORDING=true so the app can be filmed.
@@ -90,7 +95,7 @@ Future<void> main() async {
   await _initializeServices();
 
   // Check for in-app updates
-  if (!kDebugMode) { // Optional: Don't check for updates in debug mode
+  if (!kDebugMode && !kIsWeb) { // Play in-app updates: Android release builds only
     await InAppUpdateService().checkForUpdate();
   }
 
@@ -111,7 +116,7 @@ Future<void> _initializeServices() async {
     // any error the consent helper fails open so ads are never permanently
     // blocked. NOTE: a GDPR message must be configured in the AdMob console for
     // a consent form to actually appear.
-    unawaited(_initializeAdsWithConsent());
+    if (!kIsWeb) unawaited(_initializeAdsWithConsent());
 
     await serviceLocator.init();
   } catch (e, stackTrace) {
@@ -617,27 +622,29 @@ class HomeScreenState extends State<HomeScreen> {
     _userProfile = widget.userProfile;
     _pageController = PageController();
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      final prefs = await SharedPreferences.getInstance();
-      final blockedUsers = prefs.getStringList('blocked_users') ?? [];
-      final senderId = message.data['sender_id'] as String?;
+    if (!kIsWeb) {
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+        final prefs = await SharedPreferences.getInstance();
+        final blockedUsers = prefs.getStringList('blocked_users') ?? [];
+        final senderId = message.data['sender_id'] as String?;
 
-      if (senderId != null && blockedUsers.contains(senderId)) {
-        if (kDebugMode) {
-          print('Foreground notification from blocked user $senderId. Discarding.');
+        if (senderId != null && blockedUsers.contains(senderId)) {
+          if (kDebugMode) {
+            print('Foreground notification from blocked user $senderId. Discarding.');
+          }
+          return; // Silently discard notification
         }
-        return; // Silently discard notification
-      }
 
-      if (message.notification != null) {
-        if (kDebugMode) {
-          print('Displaying foreground notification: ${message.notification!.title}');
+        if (message.notification != null) {
+          if (kDebugMode) {
+            print('Displaying foreground notification: ${message.notification!.title}');
+          }
         }
-      }
-      if (mounted) {
-        context.read<NotificationProvider>().refresh();
-      }
-    });
+        if (mounted) {
+          context.read<NotificationProvider>().refresh();
+        }
+      });
+    }
     
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _likeService.grantDailyLike();

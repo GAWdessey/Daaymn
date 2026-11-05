@@ -469,8 +469,8 @@ class DiscoverScreenState extends State<DiscoverScreen> with AutomaticKeepAliveC
                   Text('Discover', style: Theme.of(context).textTheme.displaySmall?.copyWith(color: Theme.of(context).colorScheme.onSurface)),
                   Row(
                     children: [
-                      IconButton(key: _preferencesKey, icon: const Icon(Icons.hourglass_empty, size: 28), onPressed: showPreferencesDialog),
-                      IconButton(key: _refreshKey, icon: const Icon(Icons.refresh, size: 28), onPressed: fetchProfiles),
+                      IconButton(key: _preferencesKey, tooltip: 'Discovery preferences', icon: const Icon(Icons.hourglass_empty, size: 28), onPressed: showPreferencesDialog),
+                      IconButton(key: _refreshKey, tooltip: 'Refresh', icon: const Icon(Icons.refresh, size: 28), onPressed: fetchProfiles),
                     ],
                   )
                 ],

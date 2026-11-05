@@ -60,34 +60,67 @@ final demoDiscover = <Profile>[
     'Podcasts',
     'Cooking',
   ], verified: true),
-  _person('ethan', 'Ethan', 29, 'Pastry chef', ['Baking', 'Travel', 'Cinema']),
 ];
 
-final demoMatchPopup = _person('hannah', 'Hannah', 26, 'Illustrator', [
-  'Anime',
-  'Plants',
-  'Vinyl',
-], verified: true);
+/// Liked You: people who liked Sam first. Liking one back makes a match in Messages.
+final demoLikedYou = <Profile>[
+  _person('hannah', 'Hannah', 26, 'Illustrator', [
+    'Anime',
+    'Plants',
+    'Vinyl',
+  ], verified: true),
+];
 
-// Fiona, Grace, David and Noah have chats going; Hannah is a new match with nothing said yet.
+/// Your Likes: people Sam liked who haven't liked back yet. Each fill of the heart
+/// spends a like; at 5/5 Sam can send them a One-Time Message.
+class DemoLiked {
+  final Profile profile;
+  int level;
+  String
+  left; // what the countdown tag reads: the like expires 3 days after it's sent
+  bool open = false;
+  DemoLiked(this.profile, this.level, this.left);
+}
+
+List<DemoLiked> demoYourLikes() => [
+  DemoLiked(
+    _person('grace', 'Grace', 27, 'Journalist', ['Poetry', 'Gigs', 'Cycling']),
+    3,
+    '2 days remaining',
+  ),
+  DemoLiked(
+    _person('ethan', 'Ethan', 29, 'Pastry chef', [
+      'Baking',
+      'Travel',
+      'Cinema',
+    ]),
+    1,
+    '18h 20m remaining',
+  ),
+];
+
+/// One-Time Messages: David filled his heart for Sam and sent one line. Accepting it
+/// makes a match ("It's a Match!") and opens the chat.
+final demoOtmFrom = _person('david', 'David', 31, 'Sound engineer', [
+  'Vinyl',
+  'Braai',
+  'Mountain bikes',
+], online: false);
+const demoOtmText =
+    'A designer who surfs? I mix records and braai. Gig at the Waiting Room on Friday?';
+
+// Fiona and Noah have chats going.
 final demoMatches = <Profile>[
   _person('fiona', 'Fiona', 28, 'Vet', [
     'Dogs',
     'Trail runs',
     'Pottery',
   ], verified: true),
-  _person('grace', 'Grace', 27, 'Journalist', ['Poetry', 'Gigs', 'Cycling']),
-  _person('david', 'David', 31, 'Sound engineer', [
-    'Vinyl',
-    'Braai',
-    'Mountain bikes',
-  ]),
   // The "sam" photo set; the demo user is called Sam, so this person is Noah.
   _person('sam', 'Noah', 30, 'Paramedic', ['Surf', 'Coffee', 'Comedy']),
-  demoMatchPopup,
 ];
 
-/// Only a like on one of these people is a match; every other like just moves on.
+/// Only a like on one of these people is a match; every other like goes to Your Likes.
 const demoMutualIds = {'demo-jessica'};
 
 /// The demo user's own profile. Sam wears the "chris" photo set, which nobody in the
@@ -95,6 +128,7 @@ const demoMutualIds = {'demo-jessica'};
 const demoMyName = 'Sam';
 const demoMyAge = 29;
 const demoMyJob = 'Product designer';
+const demoMyLikes = 24;
 final demoMyAllPhotos = [for (var i = 1; i <= 3; i++) demoPhoto('chris', i)];
 final demoMyPhotos = demoMyAllPhotos.take(2).toList();
 
@@ -115,21 +149,6 @@ const demoChat = <DemoMessage>[
 /// Every chat the demo opens with, by match id, newest thread first.
 final demoChats = <String, List<DemoMessage>>{
   'demo-fiona': demoChat,
-  'demo-grace': const [
-    DemoMessage(
-      false,
-      'You said you know the best koeksisters in Cape Town. Prove it.',
-    ),
-    DemoMessage(true, 'Bo-Kaap, Saturday morning. Bring an appetite.'),
-    DemoMessage(true, 'Saturday market then?'),
-  ],
-  'demo-david': const [
-    DemoMessage(true, 'A sound engineer who also braais? Go on.'),
-    DemoMessage(
-      false,
-      'Ha, I mix records and boerewors. Gig at the Waiting Room on Friday?',
-    ),
-  ],
   'demo-sam': const [
     DemoMessage(false, 'Muizenberg or Big Bay?'),
     DemoMessage(true, 'Muizenberg, early, before the wind picks up.'),
@@ -138,39 +157,16 @@ final demoChats = <String, List<DemoMessage>>{
   ],
 };
 
-/// When each thread's last message came in, as the list shows it.
-const demoChatTimes = {
-  'demo-fiona': '2m',
-  'demo-grace': '1h',
-  'demo-david': '3h',
-  'demo-sam': 'Yesterday',
-};
+/// Unread messages per thread, as the Messages list counts them.
+const demoUnread = {'demo-fiona': 2};
 
-/// Threads whose last message you haven't read yet.
-const demoUnread = {'demo-fiona', 'demo-david'};
-
-const demoStartVibes = {'Adventurer', 'Foodie', 'Music head'};
-
-const demoVibes = <String>[
-  'Early bird',
-  'Night owl',
-  'Adventurer',
-  'Homebody',
-  'Foodie',
-  'Bookworm',
-  'Gym rat',
-  'Music head',
-  'Creative',
-  'Gamer',
-  'Beach bum',
-  'Old soul',
-];
-
-// Daaymn Score pillars (same three the real report shows).
+// Store -> Reports: Sam's Pro report card (the same three pillars the real report shows).
 const demoScore = 8.4;
 const demoPopularity = 8.9;
 const demoEngagement = 7.6;
 const demoSafety = 8.7;
 const demoSafetyGrade = 'A';
-const demoScoreNote =
-    'Top 15% in Cape Town this week. Reply faster to raise Engagement.';
+// The real report's words for a score of 8.0 to 8.9 (lib/services/report_service.dart).
+const demoReportHeadline = "You're Hot Property.";
+const demoReportBody =
+    "Your profile is on fire and your game is strong. You're getting noticed for all the right reasons.";
