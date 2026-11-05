@@ -6,7 +6,7 @@ import 'package:daaymn/services/batch_service.dart';
 import 'package:daaymn/services/message_cache_service.dart';
 import 'package:daaymn/services/promo_code_service.dart';
 import 'package:daaymn/utils/network_utils.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:get_it/get_it.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase_pkg;
 import 'package:daaymn/services/profile_provider.dart';
@@ -41,7 +41,8 @@ class ServiceLocator {
       getIt.registerSingleton<AdService>(AdService(), instanceName: 'scroll', dispose: (s) => s.dispose());
       getIt.registerSingleton<AdService>(AdService(), instanceName: 'ghost', dispose: (s) => s.dispose());
 
-      _preloadRewardedAds();
+      // AdMob has no web version; the web build (for reviews) shows no ads.
+      if (!kIsWeb) _preloadRewardedAds();
 
       if (kDebugMode) {
         log('ServiceLocator initialized successfully');
