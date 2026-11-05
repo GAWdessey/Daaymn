@@ -56,3 +56,6 @@ service-account.json
 # Symbiot: keep design specs, ignore run files
 .symbiot/*
 !.symbiot/design/
+
+# Claude agent worktrees: never commit (a stray gitlink broke GitHub Pages 16 Oct - 5 Nov 2026)
+.claude/worktrees/
