@@ -67,7 +67,8 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
   TabController? _reportTabController;
   ReportTier? _pendingReportTier;
   ReportTier? _unlockedTier;
-  ReportCardData? _reportData;Color _selectedCardColor = const Color(0xFF2E2E2E); // Default to a dark charcoal
+  ReportCardData? _reportData;
+  Color _selectedCardColor = const Color(0xFF4A148C); // Default to a deep purple (softer than charcoal)
   // --- State for the New Report Card Design ---Color _selectedCardColor = const Color(0xFF2E2E2E); // Default to a dark charcoal
   final List<Color> _cardColorOptions = [
     const Color(0xFF2E2E2E), // Dark Charcoal
@@ -199,9 +200,42 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
 
 
 
+  /// True when the member has no likes, passes, matches or messages yet, so
+  /// every count would read 0. Those screens show [_buildNoStatsYet] instead.
+  bool get _hasNoActivity {
+    final d = _reportData;
+    if (d == null) return false;
+    return d.likesReceived + d.dislikesReceived + d.likesSent + d.matches + d.otmsSent == 0;
+  }
+
+  Widget _buildNoStatsYet() {
+    return Container(
+      key: const Key('no-stats-yet'),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: const Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.favorite_border, color: Colors.white, size: 36),
+          SizedBox(height: 12),
+          Text(
+            'Like a few profiles and your stats appear here',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
   // This is the new widget that displays the three pillar scores.
   Widget _buildCategoryScores() {
     if (_reportData == null) return const SizedBox.shrink();
+    if (_hasNoActivity) return _buildNoStatsYet();
 
     return Column(
       children: [
@@ -547,7 +581,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
               unselectedLabelColor: Colors.white.withAlpha(178),
               indicator: BoxDecoration(
                 borderRadius: BorderRadius.circular(50),
-                color: Colors.black.withAlpha(102),
+                color: Colors.black.withAlpha(70),
                 border: Border.all(color: Colors.white.withAlpha(38)),
               ),
               tabs: [
@@ -590,7 +624,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
 
     return Card(
       elevation: 8,
-      color: Colors.black.withValues(alpha: 0.4),
+      color: Colors.black.withValues(alpha: 0.22),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       clipBehavior: Clip.antiAlias,
       child: Padding(
@@ -788,7 +822,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
       return Card(
         elevation: 8, margin: const EdgeInsets.symmetric(vertical: 8.0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: BorderSide(color: Colors.blueAccent[100]!, width: 2)),
-        clipBehavior: Clip.antiAlias, color: Colors.black.withValues(alpha: 0.3),
+        clipBehavior: Clip.antiAlias, color: Colors.black.withValues(alpha: 0.18),
         child: InkWell(
           onTap: _claimFreeMonthlyReport,
           child: Padding(
@@ -813,7 +847,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
       return Card(
         elevation: 8, margin: const EdgeInsets.symmetric(vertical: 8.0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: BorderSide(color: Colors.grey[700]!, width: 2)),
-        clipBehavior: Clip.antiAlias, color: Colors.black.withValues(alpha: 0.3),
+        clipBehavior: Clip.antiAlias, color: Colors.black.withValues(alpha: 0.18),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
@@ -2270,7 +2304,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
           margin: const EdgeInsets.symmetric(vertical: 8.0),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           clipBehavior: Clip.antiAlias,
-          color: Colors.black.withValues(alpha: isPopular ? 0.4 : 0.2),
+          color: Colors.black.withValues(alpha: isPopular ? 0.25 : 0.15),
           child: InkWell(
             onTap: () {
               if (isPromoClaimable) {
@@ -2441,6 +2475,7 @@ class _BuyLikesScreenContentState extends State<_BuyLikesScreenContent> with Tic
   }
 
   Widget _buildDeluxeStatsSection() {
+    if (_hasNoActivity) return _buildNoStatsYet();
     return Card(
       margin: const EdgeInsets.only(top: 24.0),
       child: Padding(

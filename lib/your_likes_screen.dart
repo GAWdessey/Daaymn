@@ -538,7 +538,7 @@ class _CountdownTagState extends State<_CountdownTag> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: _remaining.inHours < 24 ? Colors.red.shade700 : Colors.black.withAlpha(179),
+        color: _remaining.inHours < 24 ? Colors.red.shade700 : Colors.blueGrey.shade600,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white, width: 0.5),
       ),
