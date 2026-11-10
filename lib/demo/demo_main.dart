@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:daaymn/demo/demo_data.dart';
 import 'package:daaymn/globals.dart';
+import 'package:daaymn/widgets/photo_fallback.dart';
 import 'package:daaymn/widgets/profile_card.dart';
 import 'package:daaymn/widgets/verified_badge.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -80,6 +81,20 @@ Future<void> precacheDemoPhotos() async {
 
 /// A demo photo fetched as bytes (HttpGet). The browser-decoded default (HtmlImage) paints
 /// black when a card is drawn a second time.
+/// A round demo avatar. A photo that fails to load shows the person's initial
+/// on the app's gradient instead of a blank circle.
+Widget _demoAvatar(String name, String url, double radius) => SizedBox.square(
+  dimension: radius * 2,
+  child: ClipOval(
+    child: Image(
+      image: demoImage(url),
+      fit: BoxFit.cover,
+      excludeFromSemantics: true,
+      errorBuilder: (_, _, _) => PhotoFallback(name: name, compact: true),
+    ),
+  ),
+);
+
 CachedNetworkImageProvider demoImage(String url) => CachedNetworkImageProvider(
   url,
   imageRenderMethodForWeb: ImageRenderMethodForWeb.HttpGet,
@@ -608,7 +623,7 @@ class DemoHome extends StatelessWidget {
                   alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(horizontal: 18),
                   decoration: BoxDecoration(
-                    color: Colors.black.withAlpha(64),
+                    color: const Color(0xE6141420),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.white.withAlpha(51)),
                   ),
@@ -637,16 +652,13 @@ class DemoHome extends StatelessWidget {
                   width: 44,
                   height: 44,
                   child: Center(
-                    child: CircleAvatar(
-                      radius: 20,
-                      backgroundColor: Colors.grey.shade300,
-                      backgroundImage: store.photos.first == null
-                          ? null
-                          : demoImage(store.photos.first!),
-                      child: store.photos.first == null
-                          ? const Icon(Icons.person, size: 20)
-                          : null,
-                    ),
+                    child: store.photos.first == null
+                        ? CircleAvatar(
+                            radius: 20,
+                            backgroundColor: Colors.grey.shade300,
+                            child: const Icon(Icons.person, size: 20),
+                          )
+                        : _demoAvatar(store.name, store.photos.first!, 20),
                   ),
                 ),
               ),
@@ -1168,56 +1180,50 @@ class _DemoYourLikesState extends State<DemoYourLikes> {
             padding: const EdgeInsets.fromLTRB(16, 12, 8, 16),
             child: Row(
               children: [
-                Stack(
-                  clipBehavior: Clip.none,
-                  alignment: Alignment.bottomCenter,
-                  children: [
-                    CircleAvatar(
-                      radius: 28,
-                      backgroundImage: demoImage(p.imageUrl!),
-                    ),
-                    Positioned(
-                      bottom: -10,
-                      child: Container(
+                _demoAvatar(p.name, p.imageUrl!, 28),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              '${p.name}, ${p.age}',
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          VerifiedBadge(profile: p, size: 14),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
+                          horizontal: 8,
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
                           color: l.left.contains('h ')
                               ? Colors.red.shade700
-                              : Colors.black.withAlpha(179),
+                              : Colors.blueGrey.shade600,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.white, width: 0.5),
                         ),
                         child: Text(
                           l.left,
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 10,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          '${p.name}, ${p.age}',
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      VerifiedBadge(profile: p, size: 14),
                     ],
                   ),
                 ),
@@ -1256,7 +1262,7 @@ class _DemoYourLikesState extends State<DemoYourLikes> {
                             style: TextStyle(
                               fontSize: 12,
                               color: full
-                                  ? Colors.green.shade700
+                                  ? Colors.green.shade800
                                   : Colors.grey.shade700,
                               fontWeight: full
                                   ? FontWeight.bold
@@ -1426,10 +1432,7 @@ class DemoMessages extends StatelessWidget {
         DateTime.now().difference(p.lastSeen!).inMinutes < 5;
     return ListTile(
       minTileHeight: 72,
-      leading: CircleAvatar(
-        radius: 28,
-        backgroundImage: demoImage(p.imageUrl!),
-      ),
+      leading: _demoAvatar(p.name, p.imageUrl!, 28),
       title: Row(
         children: [
           if (online) ...[
@@ -1590,10 +1593,7 @@ class _DemoChatState extends State<DemoChat> {
         titleSpacing: 0,
         title: Row(
           children: [
-            CircleAvatar(
-              radius: 16,
-              backgroundImage: demoImage(profile.imageUrl!),
-            ),
+            _demoAvatar(profile.name, profile.imageUrl!, 16),
             const SizedBox(width: 10),
             Text(
               profile.name,
@@ -1674,10 +1674,7 @@ class _DemoChatState extends State<DemoChat> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          CircleAvatar(
-                            radius: 32,
-                            backgroundImage: demoImage(profile.imageUrl!),
-                          ),
+                          _demoAvatar(profile.name, profile.imageUrl!, 32),
                           const SizedBox(height: 16),
                           Text(
                             'You matched with ${profile.name}.',
@@ -2123,7 +2120,7 @@ class _DemoStoreScreenState extends State<DemoStoreScreen>
         padding: const EdgeInsets.symmetric(horizontal: 20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(50),
-          color: on ? Colors.black.withAlpha(102) : null,
+          color: on ? Colors.black.withAlpha(70) : null,
           border: Border.all(color: Colors.white.withAlpha(on ? 38 : 0)),
         ),
         child: Text(
@@ -2174,7 +2171,7 @@ class _DemoStoreScreenState extends State<DemoStoreScreen>
 
   Widget _scorecard() => Card(
     elevation: 8,
-    color: Colors.black.withValues(alpha: 0.4),
+    color: Colors.black.withValues(alpha: 0.22),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     child: Padding(
       padding: const EdgeInsets.all(24),
@@ -2389,6 +2386,7 @@ class DemoProfileEditor extends StatefulWidget {
 
 class _DemoProfileEditorState extends State<DemoProfileEditor> {
   late final DemoStore _store = _StoreScope.of(context);
+  final _photoAttempt = <int, int>{};
   late final _name = TextEditingController(text: _store.name);
   late final _age = TextEditingController(text: _store.age);
   late final _job = TextEditingController(text: _store.job);
@@ -2539,9 +2537,19 @@ class _DemoProfileEditorState extends State<DemoProfileEditor> {
         ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: Image(
+            key: ValueKey('$url#${_photoAttempt[i] ?? 0}'),
             image: demoImage(url),
             fit: BoxFit.cover,
             semanticLabel: i == 0 ? 'Your main photo' : 'Your photo ${i + 1}',
+            errorBuilder: (_, _, _) => PhotoFallback(
+              name: _store.name,
+              onRetry: () async {
+                await demoImage(url).evict();
+                if (mounted) {
+                  setState(() => _photoAttempt[i] = (_photoAttempt[i] ?? 0) + 1);
+                }
+              },
+            ),
           ),
         ),
         // The 44x44 hit area sits flush in the corner, so its centred

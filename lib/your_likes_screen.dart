@@ -405,7 +405,6 @@ class _YourLikesScreenState extends State<YourLikesScreen> {
                         ),
                       ),
                     ),
-                    Positioned(bottom: -10, child: _CountdownTag(key: isFirst ? _timerKey : null, likedAt: likedProfile.likedAt, onTimerEnd: () => _handleLikeExpired(likedProfile.profile.id))),
                   ],
                 ),
                 title: Row(
@@ -416,6 +415,14 @@ class _YourLikesScreenState extends State<YourLikesScreen> {
                     const SizedBox(width: 4),
                     VerifiedBadge(profile: likedProfile.profile, size: 14),
                   ],
+                ),
+                // The countdown sits under the name, inside the card, not over the photo.
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: _CountdownTag(key: isFirst ? _timerKey : null, likedAt: likedProfile.likedAt, onTimerEnd: () => _handleLikeExpired(likedProfile.profile.id)),
+                  ),
                 ),
                 trailing: _buildTrailingWidget(likedProfile, key: isFirst ? _superLikeKey : null),
                 onTap: () {
@@ -458,7 +465,7 @@ class _YourLikesScreenState extends State<YourLikesScreen> {
         children: [
           const Icon(Icons.favorite, color: Colors.red),
           Text('5/5', style: TextStyle(fontSize: 12, color: Colors.grey)),
-          const Text('Send Message', style: TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold)),
+          const Text('Send Message', style: TextStyle(fontSize: 10, color: Color(0xFF2E7D32), fontWeight: FontWeight.bold)),
         ],
       );
     }
@@ -536,13 +543,12 @@ class _CountdownTagState extends State<_CountdownTag> {
       timeText = '${hours}h ${minutes}m remaining';
     }
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: _remaining.inHours < 24 ? Colors.red.shade700 : Colors.blueGrey.shade600,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white, width: 0.5),
       ),
-      child: Text(timeText, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+      child: Text(timeText, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
     );
   }
 }

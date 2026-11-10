@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:daaymn/demo/demo_data.dart';
 import 'package:daaymn/demo/demo_main.dart';
+import 'package:daaymn/widgets/photo_fallback.dart';
 import 'package:daaymn/widgets/profile_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -222,6 +223,51 @@ void main() {
     expect(find.text('Your Daaymn OTM has been sent!'), findsOneWidget);
     expect(find.text('0/5'), findsOneWidget);
     await tester.pump(const Duration(seconds: 3));
+  });
+
+  testWidgets('/likes: the countdown sits inside the card, under the name', (
+    tester,
+  ) async {
+    await open(tester, '/likes', size: const Size(390, 844));
+    final card = tester.getRect(
+      find.ancestor(of: find.text('Grace, 27'), matching: find.byType(Card)),
+    );
+    final name = tester.getRect(find.text('Grace, 27'));
+    final chip = tester.getRect(find.text('2 days remaining'));
+    expect(chip.top, greaterThanOrEqualTo(name.bottom));
+    expect(chip.left, greaterThanOrEqualTo(card.left + 16));
+    // The chip's box lines up with the name; its text sits 8 px inside it.
+    expect(chip.left, closeTo(name.left + 8, 1));
+  });
+
+  testWidgets('a photo that fails to load shows an initial and a retry', (
+    tester,
+  ) async {
+    var retried = 0;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SizedBox(
+          width: 300,
+          height: 375,
+          child: PhotoFallback(name: 'Isla', onRetry: () => retried++),
+        ),
+      ),
+    );
+    expect(find.text('I'), findsOneWidget);
+    expect(find.text("Photo didn't load. Tap to retry"), findsOneWidget);
+    await tester.tap(find.byType(PhotoFallback));
+    expect(retried, 1);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: SizedBox.square(
+          dimension: 56,
+          child: PhotoFallback(name: 'grace', compact: true),
+        ),
+      ),
+    );
+    expect(find.text('G'), findsOneWidget);
+    expect(find.textContaining("didn't load"), findsNothing);
   });
 
   testWidgets('/likes/otm opens with the message box ready', (tester) async {
