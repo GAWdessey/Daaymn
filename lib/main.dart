@@ -1114,7 +1114,7 @@ class HomeScreenState extends State<HomeScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       decoration: BoxDecoration(
-                        color: Colors.black.withAlpha(64),
+                        color: const Color(0xE6141420), // dark enough for the gold text to pass AA,
                         borderRadius: BorderRadius.circular(12.0),
                         border: Border.all(
                           color: Colors.white.withAlpha(51),

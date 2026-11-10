@@ -3,6 +3,7 @@ import 'package:cached_network_image_platform_interface/cached_network_image_pla
     show ImageRenderMethodForWeb;
 import 'package:daaymn/globals.dart';
 import 'package:daaymn/widgets/online_indicator.dart';
+import 'package:daaymn/widgets/photo_fallback.dart';
 import 'package:daaymn/widgets/verified_badge.dart';
 import 'package:flutter/material.dart';
 
@@ -61,34 +62,11 @@ class ProfileCard extends StatelessWidget {
             children: [
               // Full-card background image
               Positioned.fill(
-                child:
-                    (profile.imageUrl != null && profile.imageUrl!.isNotEmpty)
-                    ? CachedNetworkImage(
-                        imageUrl: profile.imageUrl!,
-                        memCacheWidth: 1080,
-                        imageRenderMethodForWeb: imageRenderMethodForWeb,
-                        fadeInDuration: imageFadeIn,
-                        fadeOutDuration: imageFadeIn, // the placeholder's fade
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) =>
-                            Container(color: Colors.grey[800]),
-                        errorWidget: (context, url, error) => Container(
-                          color: Colors.grey[800],
-                          child: const Icon(
-                            Icons.person,
-                            size: 80,
-                            color: Colors.white30,
-                          ),
-                        ),
-                      )
-                    : Container(
-                        color: Colors.grey[800],
-                        child: const Icon(
-                          Icons.person,
-                          size: 80,
-                          color: Colors.white30,
-                        ),
-                      ),
+                child: _CardPhoto(
+                  profile: profile,
+                  fadeIn: imageFadeIn,
+                  renderMethod: imageRenderMethodForWeb,
+                ),
               ),
               // Protective gradient for text readability
               Positioned.fill(
@@ -356,6 +334,52 @@ class _FocusRingState extends State<_FocusRing> {
         ),
         child: widget.child,
       ),
+    );
+  }
+}
+
+/// The card's full-size photo. If it fails to load, the person's initial on the
+/// app's gradient says so, and a tap fetches it again.
+class _CardPhoto extends StatefulWidget {
+  final Profile profile;
+  final Duration fadeIn;
+  final ImageRenderMethodForWeb renderMethod;
+
+  const _CardPhoto({
+    required this.profile,
+    required this.fadeIn,
+    required this.renderMethod,
+  });
+
+  @override
+  State<_CardPhoto> createState() => _CardPhotoState();
+}
+
+class _CardPhotoState extends State<_CardPhoto> {
+  int _attempt = 0;
+
+  Future<void> _retry(String url) async {
+    await CachedNetworkImage.evictFromCache(url);
+    if (mounted) setState(() => _attempt++);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final url = widget.profile.imageUrl;
+    if (url == null || url.isEmpty) {
+      return PhotoFallback(name: widget.profile.name);
+    }
+    return CachedNetworkImage(
+      key: ValueKey('$url#$_attempt'),
+      imageUrl: url,
+      memCacheWidth: 1080,
+      imageRenderMethodForWeb: widget.renderMethod,
+      fadeInDuration: widget.fadeIn,
+      fadeOutDuration: widget.fadeIn, // the placeholder's fade
+      fit: BoxFit.cover,
+      placeholder: (context, url) => Container(color: Colors.grey[800]),
+      errorWidget: (context, url, error) =>
+          PhotoFallback(name: widget.profile.name, onRetry: () => _retry(url)),
     );
   }
 }
