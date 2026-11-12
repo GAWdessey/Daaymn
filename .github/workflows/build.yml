@@ -16,6 +16,8 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # Pinned: Flutter 3.50 needs Gradle 9.3.1+, which this AGP 8.11 build isn't on yet.
+          flutter-version: 3.47.9
       - run: flutter --version
       - run: flutter pub get
       - run: flutter analyze --no-fatal-infos --no-fatal-warnings
