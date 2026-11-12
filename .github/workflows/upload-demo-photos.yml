@@ -1,0 +1,55 @@
+name: upload-demo-photos
+# Puts the AI-made demo photos in tool/seed-photos/ai/ into the public
+# Supabase bucket seed-photos/ai/, where lib/demo/demo_data.dart reads them.
+# Runs on master only: it uses the repo's Supabase token, the one route that
+# can write to the live project. Upserts, so re-running is safe.
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'tool/seed-photos/**'
+      - '.github/workflows/upload-demo-photos.yml'
+
+concurrency:
+  group: upload-demo-photos
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_REF: rrbsjmfwahaerkfhpegv
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Upload photos
+        run: |
+          set -euo pipefail
+          KEY=$(supabase projects api-keys --project-ref "$PROJECT_REF" -o json \
+            | jq -r '.[] | select(.name=="service_role") | .api_key')
+          echo "::add-mask::$KEY"
+          BASE="https://$PROJECT_REF.supabase.co/storage/v1/object"
+          n=0
+          for f in tool/seed-photos/ai/*.jpg; do
+            name=$(basename "$f")
+            code=$(curl -s -o /tmp/resp -w '%{http_code}' -X POST "$BASE/seed-photos/ai/$name" \
+              -H "apikey: $KEY" -H "Authorization: Bearer $KEY" \
+              -H "Content-Type: image/jpeg" -H "x-upsert: true" --data-binary "@$f")
+            if [ "$code" != 200 ]; then echo "upload $name: $code $(cat /tmp/resp)"; exit 1; fi
+            n=$((n+1))
+          done
+          echo "uploaded $n photos"
+      - name: Check every photo is public
+        run: |
+          set -euo pipefail
+          for f in tool/seed-photos/ai/*.jpg; do
+            name=$(basename "$f")
+            code=$(curl -s -o /dev/null -w '%{http_code}' \
+              "https://$PROJECT_REF.supabase.co/storage/v1/object/public/seed-photos/ai/$name")
+            echo "$code $name"
+            [ "$code" = 200 ]
+          done
