@@ -1,0 +1,63 @@
+name: check-discover
+# Read-only check of what live Discover shows a real member: reads the
+# public_profiles view (the table Discover reads) as a real, non-seed
+# member and as the seed test account, and prints counts only (no names).
+# Nothing is written: each query sets its role and identity with
+# transaction-local settings that end with the query.
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/check-discover.yml'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_REF: rrbsjmfwahaerkfhpegv
+    steps:
+      - name: Read Discover as a real member and as the seed account
+        run: |
+          set -euo pipefail
+          q() {
+            curl -sS --fail-with-body -X POST \
+              "https://api.supabase.com/v1/projects/$PROJECT_REF/database/query" \
+              -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "$(jq -n --arg q "$1" '{query: $q}')"
+          }
+
+          # Stored totals, read as the owner.
+          totals=$(q "select count(*) filter (where is_seed_profile) as seed_stored,
+                             count(*) filter (where not is_seed_profile) as real_stored,
+                             count(*) filter (where not is_seed_profile and age is not null) as real_with_age
+                      from public.profiles")
+
+          # What a member sees, read through the view under their identity.
+          as_member() {
+            q "select set_config('request.jwt.claims',
+                 json_build_object('sub', (select id from public.profiles
+                   where is_seed_profile = $1 order by created_at limit 1)::text,
+                   'role', 'authenticated')::text, true);
+               set local role authenticated;
+               select set_config('check.ids', coalesce((select string_agg(id::text, ',')
+                 from public.public_profiles
+                 where id <> (current_setting('request.jwt.claims')::json->>'sub')::uuid), ''), true);
+               reset role;
+               select count(*) filter (where p.is_seed_profile) as seed_visible,
+                      count(*) filter (where not p.is_seed_profile) as real_visible
+               from public.profiles p
+               where p.id::text = any (string_to_array(current_setting('check.ids'), ','))"
+          }
+          real=$(as_member false || true)
+          seed=$(as_member true || true)
+
+          {
+            echo "## Live Discover check"
+            echo "- Stored: $totals"
+            echo "- Seen by a real member (excluding themself): $real"
+            echo "- Seen by the seed test account (excluding itself): $seed"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
