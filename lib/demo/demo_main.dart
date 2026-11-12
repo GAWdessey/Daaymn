@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:daaymn/demo/demo_data.dart';
+import 'package:daaymn/demo/demo_script.dart';
 import 'package:daaymn/globals.dart';
 import 'package:daaymn/widgets/photo_fallback.dart';
 import 'package:daaymn/widgets/profile_card.dart';
@@ -58,8 +60,16 @@ Future<void> precacheDemoPhotos() async {
     return done.future;
   }
 
+  // The first four cards are waited for; the rest load in the background so later
+  // cards don't flash.
+  unawaited(
+    Future.wait([
+      for (final p in [...demoDiscover.skip(4), ...demoLikedYou.skip(1)])
+        load(ResizeImage.resizeIfNeeded(1080, null, demoImage(p.imageUrl!))),
+    ]),
+  );
   await Future.wait([
-    for (final p in [...demoDiscover, ...demoLikedYou])
+    for (final p in [...demoDiscover.take(4), ...demoLikedYou.take(1)])
       load(ResizeImage.resizeIfNeeded(1080, null, demoImage(p.imageUrl!))),
     for (final p in [
       ...demoMatches,
@@ -236,6 +246,12 @@ class DemoStore extends ChangeNotifier {
   final List<DemoThread> threads = [];
   final Map<String, List<DemoMessage>> chats = {};
   final Map<String, int> unread = {};
+  final Set<String> typing = {}; // threads whose person is typing a reply
+  final Map<String, Timer> _replyTimers = {};
+  final Map<String, Set<String>> _usedLines = {};
+  final Random _rng = Random();
+  String? openChat; // the thread on screen, so a reply there is not "unread"
+  bool _disposed = false;
   String name = demoMyName;
   String age = '$demoMyAge';
   String job = demoMyJob;
@@ -345,10 +361,51 @@ class DemoStore extends ChangeNotifier {
 
   List<DemoMessage> chatOf(Profile p) => chats[p.id] ?? const [];
 
+  /// Sends a message. A match answers by script: 1 to 2 s of nothing, 1 to 2 s of
+  /// typing dots, then the reply. Several sends before the reply make one reply,
+  /// timed from the last send.
   void send(Profile p, String text) {
     chats[p.id] = [...chatOf(p), DemoMessage(true, text)];
     unread.remove(p.id);
+    _replyTimers.remove(p.id)?.cancel();
+    typing.remove(p.id);
+    final t = threads.where((t) => t.profile.id == p.id);
+    if (t.isNotEmpty && !t.first.otm) {
+      _replyTimers[p.id] = Timer(_wait(), () {
+        typing.add(p.id);
+        notifyListeners();
+        _replyTimers[p.id] = Timer(_wait(), () {
+          _replyTimers.remove(p.id);
+          typing.remove(p.id);
+          final reply = demoReplyFor(
+            p.id,
+            text,
+            _usedLines.putIfAbsent(p.id, () => <String>{}),
+            _rng,
+          );
+          chats[p.id] = [...chatOf(p), DemoMessage(false, reply)];
+          if (openChat != p.id) unread[p.id] = (unread[p.id] ?? 0) + 1;
+          notifyListeners();
+        });
+      });
+    }
     notifyListeners();
+  }
+
+  Duration _wait() => Duration(milliseconds: 1000 + _rng.nextInt(1001));
+
+  @override
+  void dispose() {
+    _disposed = true;
+    for (final t in _replyTimers.values) {
+      t.cancel();
+    }
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_disposed) super.notifyListeners();
   }
 
   void markRead(Profile p) {
@@ -450,7 +507,9 @@ class _DemoAppState extends State<DemoApp> {
             MaterialPageRoute<void>(builder: (_) => const DemoHome()),
           if (start.over == 'chat')
             MaterialPageRoute<void>(
-              builder: (_) => DemoChat(profile: demoMatches.first),
+              builder: (_) => DemoChat(
+                profile: demoMatches.firstWhere((p) => p.id == 'demo-fiona'),
+              ),
             ),
           if (start.over == 'otm')
             MaterialPageRoute<void>(
@@ -503,7 +562,17 @@ class DemoWelcome extends StatelessWidget {
                   shadows: _shadow,
                 ),
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 12),
+              const Text(
+                'Everyone here is made up. Photos are AI-made.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  shadows: _shadow,
+                ),
+              ),
+              const SizedBox(height: 36),
               FilledButton(
                 style: FilledButton.styleFrom(
                   backgroundColor: Colors.white,
@@ -859,7 +928,11 @@ class _DemoDiscoverState extends State<DemoDiscover> {
       _snack(context, "You're out of likes. Tap Buy to get more.");
       return;
     }
+    final p = store.current;
     store.swipe(like: like);
+    if (like && p != null && demoMutualIds.contains(p.id)) {
+      _snack(context, "You and ${p.name} matched. Say hi in Messages.");
+    }
     if (store.deckDone) _setAddress('/discover/empty');
   }
 
@@ -944,6 +1017,7 @@ class _DemoDiscoverState extends State<DemoDiscover> {
                         imageFadeIn: Duration.zero,
                         imageRenderMethodForWeb:
                             ImageRenderMethodForWeb.HttpGet,
+                        demoTag: true,
                       ),
                     );
                   },
@@ -1176,8 +1250,15 @@ class _DemoYourLikesState extends State<DemoYourLikes> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         children: [
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(12, 12, 0, 0),
+              child: DemoTag(),
+            ),
+          ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 8, 16),
+            padding: const EdgeInsets.fromLTRB(16, 8, 8, 16),
             child: Row(
               children: [
                 _demoAvatar(p.name, p.imageUrl!, 28),
@@ -1341,6 +1422,7 @@ class DemoLikedYou extends StatelessWidget {
                             imageFadeIn: Duration.zero,
                             imageRenderMethodForWeb:
                                 ImageRenderMethodForWeb.HttpGet,
+                            demoTag: true,
                             onLike: () {
                               if (store.likes == 0) {
                                 _snack(
@@ -1514,6 +1596,8 @@ class DemoChat extends StatefulWidget {
 
 class _DemoChatState extends State<DemoChat> {
   final _text = TextEditingController();
+  final _focus = FocusNode();
+  DemoStore? _store;
 
   bool _isOtm(DemoStore store) =>
       store.threads.any((t) => t.otm && t.profile.id == widget.profile.id);
@@ -1524,17 +1608,21 @@ class _DemoChatState extends State<DemoChat> {
     // Opened from any route (the list, /chat): a match's thread is read now.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final store = _StoreScope.of(context);
+      store.openChat = widget.profile.id;
       if (!_isOtm(store)) store.markRead(widget.profile);
     });
   }
 
   @override
   void dispose() {
+    if (_store?.openChat == widget.profile.id) _store!.openChat = null;
     _text.dispose();
+    _focus.dispose();
     super.dispose();
   }
 
   void _back() {
+    if (_store?.openChat == widget.profile.id) _store!.openChat = null;
     Navigator.of(context).maybePop();
     _setAddress('/messages');
   }
@@ -1544,6 +1632,7 @@ class _DemoChatState extends State<DemoChat> {
     if (t.isEmpty) return;
     store.send(widget.profile, t);
     _text.clear();
+    _focus.requestFocus();
   }
 
   Future<void> _accept(DemoStore store) async {
@@ -1577,8 +1666,10 @@ class _DemoChatState extends State<DemoChat> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final store = _StoreScope.of(context);
+    _store = store;
     final profile = widget.profile;
     final messages = store.chatOf(profile);
+    final typing = store.typing.contains(profile.id);
     final otm = _isOtm(store);
     final online =
         profile.lastSeen != null &&
@@ -1666,6 +1757,23 @@ class _DemoChatState extends State<DemoChat> {
                 style: const TextStyle(fontSize: 14),
               ),
             ),
+          Container(
+            width: double.infinity,
+            color: Colors.grey.shade100,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline, size: 16, color: Colors.grey.shade700),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Demo chat: replies are scripted.',
+                    style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+                  ),
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: messages.isEmpty
                 ? Center(
@@ -1700,6 +1808,7 @@ class _DemoChatState extends State<DemoChat> {
                     reverse: true,
                     padding: const EdgeInsets.all(16),
                     children: [
+                      if (typing) _TypingBubble(name: profile.name),
                       for (final m in messages.reversed)
                         Align(
                           alignment: m.mine
@@ -1777,6 +1886,7 @@ class _DemoChatState extends State<DemoChat> {
                         Expanded(
                           child: TextField(
                             controller: _text,
+                            focusNode: _focus,
                             textInputAction: TextInputAction.send,
                             onSubmitted: (_) => _send(store),
                             decoration: const InputDecoration(
@@ -1808,6 +1918,77 @@ class _DemoChatState extends State<DemoChat> {
       ),
     );
   }
+}
+
+/// Three dots fading in turn, in the shape of a received bubble.
+class _TypingBubble extends StatefulWidget {
+  final String name;
+  const _TypingBubble({required this.name});
+
+  @override
+  State<_TypingBubble> createState() => _TypingBubbleState();
+}
+
+class _TypingBubbleState extends State<_TypingBubble>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1200),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Align(
+    alignment: Alignment.centerLeft,
+    child: Semantics(
+      label: '${widget.name} is typing…',
+      excludeSemantics: true,
+      child: Container(
+        key: const ValueKey('typing'),
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        width: 56,
+        height: 36,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: AnimatedBuilder(
+          animation: _c,
+          builder: (_, _) => Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 0; i < 3; i++)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  child: Opacity(
+                    opacity:
+                        0.3 +
+                        0.7 *
+                            max(
+                              0.0,
+                              sin((_c.value * 2 - i * 0.3) * pi).toDouble(),
+                            ),
+                    child: Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade600,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 // ---------- Settings ----------
@@ -2546,7 +2727,9 @@ class _DemoProfileEditorState extends State<DemoProfileEditor> {
               onRetry: () async {
                 await demoImage(url).evict();
                 if (mounted) {
-                  setState(() => _photoAttempt[i] = (_photoAttempt[i] ?? 0) + 1);
+                  setState(
+                    () => _photoAttempt[i] = (_photoAttempt[i] ?? 0) + 1,
+                  );
                 }
               },
             ),

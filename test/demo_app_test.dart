@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:daaymn/demo/demo_data.dart';
 import 'package:daaymn/demo/demo_main.dart';
+import 'package:daaymn/demo/demo_script.dart';
 import 'package:daaymn/widgets/photo_fallback.dart';
 import 'package:daaymn/widgets/profile_card.dart';
 import 'package:flutter/material.dart';
@@ -144,7 +146,7 @@ void main() {
     tester,
   ) async {
     await open(tester, '/');
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < demoDiscover.length; i++) {
       await tester.tap(find.byIcon(Icons.close));
       await settle(tester);
     }
@@ -186,7 +188,8 @@ void main() {
     expect(find.text('Hannah, 26'), findsOneWidget);
     await tester.tap(find.byIcon(Icons.favorite).first);
     await settle(tester);
-    expect(find.textContaining('Nobody’s said'), findsOneWidget);
+    expect(find.text('Hannah, 26'), findsNothing);
+    expect(find.text('Zara, 25'), findsOneWidget);
     expect(find.textContaining('23', findRichText: true), findsOneWidget);
     await tester.tap(find.byIcon(Icons.chat_bubble_outline).last);
     await settle(tester);
@@ -211,7 +214,7 @@ void main() {
     final heart = find.byKey(const ValueKey('heart-demo-grace'));
     await tester.tap(heart);
     await tester.pump();
-    expect(find.text('4/5'), findsOneWidget);
+    expect(find.text('4/5'), findsNWidgets(2)); // Grace's, and Naledi's
     await tester.tap(heart);
     await tester.pump();
     expect(find.text('5/5'), findsOneWidget);
@@ -290,6 +293,7 @@ void main() {
       final matchHeader = tester.getTopLeft(find.text('Matches')).dy;
       expect(otmHeader, lessThan(matchHeader));
       expect(find.text('David'), findsOneWidget);
+      expect(find.text('Mia'), findsOneWidget);
       expect(find.text('Fiona'), findsOneWidget);
       expect(find.text('Noah'), findsOneWidget);
       expect(find.text('Daaymn, you had me at coffee.'), findsOneWidget);
@@ -333,6 +337,140 @@ void main() {
     await settle(tester);
     expect(find.text('One-Time Messages'), findsNothing);
   });
+
+  testWidgets('the deck has 12 different people, then the end card', (
+    tester,
+  ) async {
+    expect(demoDiscover.length, 12);
+    expect({for (final p in demoDiscover) p.id}.length, 12);
+    expect(demoDiscover.skip(4).map((p) => p.name), [
+      'Thandi',
+      'Marco',
+      'Lerato',
+      'Kyle',
+      'Priya',
+      'Sipho',
+      'Amy',
+      'Johan',
+    ]);
+    await open(tester, '/');
+    for (var i = 0; i < 11; i++) {
+      await tester.tap(find.byIcon(Icons.close));
+      await settle(tester);
+    }
+    expect(find.text('Johan, 38'), findsOneWidget);
+    expect(find.text("Demo · AI-made photo"), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.close));
+    await settle(tester);
+    expect(find.textContaining("You've seen everyone!"), findsOneWidget);
+  });
+
+  testWidgets('liking Kyle is a match, with a snack', (tester) async {
+    await open(tester, '/');
+    for (var i = 0; i < 7; i++) {
+      await tester.tap(find.byIcon(Icons.close));
+      await settle(tester);
+    }
+    expect(find.text('Kyle, 27'), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.favorite));
+    await settle(tester);
+    expect(
+      find.text('You and Kyle matched. Say hi in Messages.'),
+      findsOneWidget,
+    );
+    await tester.tap(find.byIcon(Icons.chat_bubble_outline).last);
+    await settle(tester);
+    expect(find.text('Kyle'), findsOneWidget);
+    expect(find.text('New Match!'), findsOneWidget);
+  });
+
+  testWidgets('the demo tag is on Liked You and Your Likes cards', (
+    tester,
+  ) async {
+    await open(tester, "/liked-you");
+    expect(find.text("Demo · AI-made photo"), findsWidgets);
+    await open(tester, '/likes');
+    expect(find.text('Demo · AI-made photo'), findsWidgets);
+    expect(find.text('Naledi, 30', skipOffstage: false), findsOneWidget);
+    expect(find.text('1 day remaining', skipOffstage: false), findsOneWidget);
+  });
+
+  testWidgets('the Welcome screen says everyone is made up', (tester) async {
+    await open(tester, '/welcome');
+    expect(
+      find.text('Everyone here is made up. Photos are AI-made.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets(
+    'every chat has the scripted strip; a reply arrives after a send',
+    (tester) async {
+      await open(tester, '/chat');
+      expect(find.text('Demo chat: replies are scripted.'), findsOneWidget);
+      final before = find.byType(Text).evaluate().length;
+      await tester.enterText(find.byType(TextField), 'hey');
+      await tester.tap(find.byTooltip('Send'));
+      await tester.pump();
+      expect(find.text('hey'), findsOneWidget);
+      expect(find.byKey(const ValueKey('typing')), findsNothing);
+      await tester.pump(const Duration(milliseconds: 2100));
+      expect(find.byKey(const ValueKey('typing')), findsOneWidget);
+      await tester.pump(const Duration(milliseconds: 2100));
+      tester.takeException();
+      expect(find.byKey(const ValueKey('typing')), findsNothing);
+      expect(find.byType(Text).evaluate().length, before + 2); // 'hey' + reply
+    },
+  );
+
+  testWidgets('"are you real?" gets the honest line, word for word', (
+    tester,
+  ) async {
+    await open(tester, '/chat');
+    await tester.enterText(find.byType(TextField), 'are you real?');
+    await tester.tap(find.byTooltip('Send'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 2100));
+    await tester.pump(const Duration(milliseconds: 2100));
+    tester.takeException();
+    expect(find.text(demoHonestLine), findsOneWidget);
+  });
+
+  testWidgets('leaving while the dots show: the reply lands unread', (
+    tester,
+  ) async {
+    await open(tester, '/chat');
+    await tester.enterText(find.byType(TextField), 'hey');
+    await tester.tap(find.byTooltip('Send'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 2100));
+    expect(find.byKey(const ValueKey('typing')), findsOneWidget);
+    await tester.tap(find.byType(BackButton));
+    await settle(tester);
+    await tester.pump(const Duration(milliseconds: 2100));
+    tester.takeException();
+    expect(find.byKey(const ValueKey('unread-demo-fiona')), findsOneWidget);
+    expect(find.text('1'), findsWidgets);
+  });
+
+  test(
+    'replies: never the same line twice in a row, no repeats until used up',
+    () {
+      final used = <String>{};
+      final rng = Random(1);
+      String? last;
+      for (var i = 0; i < 40; i++) {
+        final r = demoReplyFor('demo-mia', 'hey', used, rng);
+        expect(r, isNot(last));
+        last = r;
+      }
+      expect(demoCueName('are you a bot?'), 'honest');
+      expect(demoCueName('fuck off'), 'rude');
+      expect(demoCueName('Coffee on Saturday'), 'plan');
+      expect(demoReplyFor('demo-nobody', 'whatever', {}, rng), isNotEmpty);
+      expect(demoHasScript('demo-kyle'), isTrue);
+    },
+  );
 
   testWidgets('/chat: Fiona, the app\'s menu, sending works', (tester) async {
     await open(tester, '/chat');

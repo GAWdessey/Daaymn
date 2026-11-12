@@ -60,6 +60,30 @@ final demoDiscover = <Profile>[
     'Podcasts',
     'Cooking',
   ], verified: true),
+  _person('thandi', 'Thandi', 24, 'Architecture student', [
+    'Sketching',
+    'Jazz',
+    'Hiking',
+  ], verified: true),
+  _person('marco', 'Marco', 33, 'Chef', ['Food markets', 'Padel', 'Wine']),
+  _person('lerato', 'Lerato', 31, 'GP', ['Running', 'Brunch', 'Series']),
+  _person('kyle', 'Kyle', 27, 'Electrician', ['Fishing', 'Rugby', 'Braai']),
+  _person('priya', 'Priya', 29, 'Data analyst', [
+    'Yoga',
+    'Board games',
+    'Curry',
+  ]),
+  _person(
+    'sipho',
+    'Sipho',
+    36,
+    'Architect',
+    ['Jazz', 'Cycling', 'Coffee'],
+    verified: true,
+    online: false,
+  ),
+  _person('amy', 'Amy', 22, 'Barista', ['Thrifting', 'Indie music', 'Dogs']),
+  _person('johan', 'Johan', 38, 'Winemaker', ['Hiking', 'Rugby', 'Dogs']),
 ];
 
 /// Liked You: people who liked Sam first. Liking one back makes a match in Messages.
@@ -68,6 +92,12 @@ final demoLikedYou = <Profile>[
     'Anime',
     'Plants',
     'Vinyl',
+  ], verified: true),
+  _person('zara', 'Zara', 25, 'Nurse', ['Dance', 'Sushi', 'Beach']),
+  _person('tom', 'Tom', 32, 'Pilot', [
+    'Travel',
+    'Golf',
+    'Podcasts',
   ], verified: true),
 ];
 
@@ -97,6 +127,11 @@ List<DemoLiked> demoYourLikes() => [
     1,
     '18h 20m remaining',
   ),
+  DemoLiked(
+    _person('naledi', 'Naledi', 30, 'Lawyer', ['Theatre', 'Wine', 'Tennis']),
+    4,
+    '1 day remaining',
+  ),
 ];
 
 /// One-Time Messages: David filled his heart for Sam and sent one line. Accepting it
@@ -111,6 +146,11 @@ const demoOtmText =
 
 // Fiona and Noah have chats going.
 final demoMatches = <Profile>[
+  _person('mia', 'Mia', 27, 'Florist', [
+    'Markets',
+    'Sea swims',
+    'Film photography',
+  ]),
   _person('fiona', 'Fiona', 28, 'Vet', [
     'Dogs',
     'Trail runs',
@@ -121,7 +161,7 @@ final demoMatches = <Profile>[
 ];
 
 /// Only a like on one of these people is a match; every other like goes to Your Likes.
-const demoMutualIds = {'demo-jessica'};
+const demoMutualIds = {'demo-jessica', 'demo-kyle'};
 
 /// The demo user's own profile. Sam wears the "chris" photo set, which nobody in the
 /// deck or the matches uses; he starts with two of its three photos, and Add puts in his own.
@@ -148,6 +188,11 @@ const demoChat = <DemoMessage>[
 
 /// Every chat the demo opens with, by match id, newest thread first.
 final demoChats = <String, List<DemoMessage>>{
+  'demo-mia': const [
+    DemoMessage(false, 'Your coffee photo, is that Truth on Buitenkant?'),
+    DemoMessage(true, 'It is. Best flat white in town.'),
+    DemoMessage(false, 'Bold claim. Prove it on Saturday?'),
+  ],
   'demo-fiona': demoChat,
   'demo-sam': const [
     DemoMessage(false, 'Muizenberg or Big Bay?'),
@@ -158,7 +203,7 @@ final demoChats = <String, List<DemoMessage>>{
 };
 
 /// Unread messages per thread, as the Messages list counts them.
-const demoUnread = {'demo-fiona': 2};
+const demoUnread = {'demo-mia': 1, 'demo-fiona': 2};
 
 // Store -> Reports: Sam's Pro report card (the same three pillars the real report shows).
 const demoScore = 8.4;

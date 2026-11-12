@@ -24,6 +24,8 @@ class ProfileCard extends StatelessWidget {
   // How the photo is fetched on web. The web demo uses HttpGet: a photo decoded by the
   // browser (HtmlImage) can paint black when its card is drawn a second time.
   final ImageRenderMethodForWeb imageRenderMethodForWeb;
+  // The web demo marks every made-up person; the shipped app never sets this.
+  final bool demoTag;
 
   const ProfileCard({
     super.key,
@@ -40,6 +42,7 @@ class ProfileCard extends StatelessWidget {
     this.extraAction,
     this.imageFadeIn = const Duration(milliseconds: 500),
     this.imageRenderMethodForWeb = ImageRenderMethodForWeb.HtmlImage,
+    this.demoTag = false,
   });
 
   @override
@@ -211,6 +214,8 @@ class ProfileCard extends StatelessWidget {
                 ),
               ),
 
+              if (demoTag)
+                const Positioned(top: 12, left: 12, child: DemoTag()),
               // Dislike counter (if applicable)
               if (dislikeCount != null && dislikeCount! > 0)
                 Positioned(
@@ -382,4 +387,33 @@ class _CardPhotoState extends State<_CardPhoto> {
           PhotoFallback(name: widget.profile.name, onRetry: () => _retry(url)),
     );
   }
+}
+
+/// "Demo · AI-made photo": the pill on every made-up person's photo in the web demo.
+class DemoTag extends StatelessWidget {
+  const DemoTag({super.key});
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: 'Demo profile, AI-made photo',
+    excludeSemantics: true,
+    child: Container(
+      key: const ValueKey('demo-tag'),
+      height: 24,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Text(
+        'Demo · AI-made photo',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    ),
+  );
 }
