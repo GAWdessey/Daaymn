@@ -554,6 +554,18 @@ void main() {
     expect(find.byType(ProfileCard), findsOneWidget);
   });
 
+  testWidgets('Welcome offers the Google Play link', (tester) async {
+    await open(tester, '/welcome');
+    expect(find.text('Get Daaymn on Google Play'), findsOneWidget);
+  });
+
+  test('public /Daaymn/demo/ address: bare link is Welcome, deeper paths kept', () {
+    expect(demoPathFor('/Daaymn/demo/'), '/welcome');
+    expect(demoPathFor('/Daaymn/demo'), '/welcome');
+    expect(demoPathFor('/Daaymn/demo/chat'), '/chat');
+    expect(demoPathFor('/chat'), '/chat');
+  });
+
   testWidgets('unknown address falls back to Discover', (tester) async {
     await open(tester, '/nope');
     expect(find.text('Isla, 28'), findsOneWidget);

@@ -46,6 +46,9 @@
   .gp .t{text-align:left;line-height:1.15}
   .gp .t small{display:block;font-size:10px;color:var(--muted);letter-spacing:.5px}
   .gp .t b{font-size:18px;font-weight:600}
+  .demo-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;box-sizing:border-box;padding:0 28px;border:1px solid var(--pink);border-radius:14px;color:#fff;font-size:16px;font-weight:600;text-decoration:none;transition:.2s}
+  .demo-btn:hover{background:rgba(252,0,255,.14);transform:translateY(-2px)}
+  @media(max-width:600px){.cta{flex-direction:column;align-items:stretch}.gp,.demo-btn{min-height:56px;justify-content:center}.demo-btn{padding:0}}
   .rate{color:var(--muted);font-size:13px;margin-top:16px}
 
   .shots{display:flex;gap:16px;overflow-x:auto;padding:38px 20px 10px;scroll-snap-type:x mandatory;
@@ -102,8 +105,10 @@
           <svg viewBox="0 0 512 512" aria-hidden="true"><path fill="#00d4ff" d="M47 20c-6 4-9 11-9 21v422c0 10 3 17 9 21l236-232z"/><path fill="#00f076" d="M47 20l236 232 66-65L98 8C77-3 60 6 47 20z"/><path fill="#fc00ff" d="M47 484c13 14 30 23 51 12l251-171-66-65z"/><path fill="#ffc400" d="M415 218l-66-45-66 65 66 65 66-45c20-14 20-26 0-40z"/></svg>
           <span class="t"><small>GET IT ON</small><b>Google Play</b></span>
         </a>
+        <a class="demo-btn" href="/Daaymn/demo/">Try the demo <span aria-hidden="true">→</span></a>
       </div>
       <p class="rate">Free to download · 18+ · Real people, near you</p>
+      <p class="rate" style="margin-top:6px">No sign-up for the demo. The people are made up.</p>
     </div>
   </section>
 
