@@ -399,9 +399,9 @@ class DemoTag extends StatelessWidget {
     excludeSemantics: true,
     child: Container(
       key: const ValueKey('demo-tag'),
-      height: 24,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      alignment: Alignment.center,
+      // No height/alignment: either one makes the Container fill the width it
+      // is given (a full-width bar on Your Likes). Padding keeps it a 24 px pill.
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.55),
         borderRadius: BorderRadius.circular(12),
