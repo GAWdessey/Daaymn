@@ -1282,7 +1282,7 @@ class _DemoYourLikesState extends State<DemoYourLikes> {
           const Align(
             alignment: Alignment.centerLeft,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(12, 12, 0, 0),
+              padding: EdgeInsets.fromLTRB(12, 12, 12, 0),
               child: DemoTag(),
             ),
           ),

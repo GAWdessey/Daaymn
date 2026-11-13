@@ -99,6 +99,16 @@
 <body>
   <div id="splash" class="center" aria-hidden="true" style="font:700 44px Georgia,serif;color:#fff">Daaym<span style="color:#FC00FF">n</span></div>
   <noscript><p style="color:#fff;font:16px sans-serif;padding:24px">This demo needs a newer browser. <a style="color:#FC00FF" href="https://play.google.com/store/apps/details?id=com.daaymn.daaymn">Get Daaymn on Google Play instead.</a></p></noscript>
+  <script>
+    // Back from 404.html: put the screen's address back before Flutter reads it.
+    (function () {
+      try {
+        var p = sessionStorage.getItem('daaymn-demo-path');
+        sessionStorage.removeItem('daaymn-demo-path');
+        if (p && p.indexOf('/Daaymn/demo/') === 0) history.replaceState(null, '', p);
+      } catch (e) {}
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async=""></script>
 
 

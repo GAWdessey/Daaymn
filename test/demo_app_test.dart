@@ -395,6 +395,25 @@ void main() {
     expect(find.text('1 day remaining', skipOffstage: false), findsOneWidget);
   });
 
+  testWidgets('the Your Likes demo pill hugs its words, inset from the card', (
+    tester,
+  ) async {
+    await open(tester, '/likes');
+    final tag = find.byKey(const ValueKey('demo-tag')).first;
+    final card = find.ancestor(of: tag, matching: find.byType(Card)).first;
+    final t = tester.getRect(tag);
+    final c = tester.getRect(
+      find.descendant(of: card, matching: find.byType(Material)).first,
+    );
+    final words = tester.getRect(
+      find.descendant(of: tag, matching: find.text('Demo · AI-made photo')),
+    );
+    expect(t.width, words.width + 20); // hugs its words, not a full-width bar
+    expect(t.left - c.left, 12);
+    expect(c.right - t.right, greaterThanOrEqualTo(12));
+    expect(t.height, inInclusiveRange(22, 26));
+  });
+
   testWidgets('the Welcome screen says everyone is made up', (tester) async {
     await open(tester, '/welcome');
     expect(
