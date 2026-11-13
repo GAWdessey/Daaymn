@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // Demo mode entrypoint: no Supabase, no Firebase, no login. Run with
 // tool/run_demo.sh (see README). It draws the shipped app's screens (its header,
@@ -27,8 +28,21 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 //   /match -> /liked-you, /matches -> /messages, /score -> /store, /vibe -> /likes.
 void main() {
   usePathUrlStrategy();
-  runApp(DemoApp(initialPath: Uri.base.path));
+  runApp(DemoApp(initialPath: demoPathFor(Uri.base.path)));
 }
+
+/// On the public build (served under /Daaymn/demo/) the page address carries that
+/// prefix. Strip it, and let the bare /Daaymn/demo/ link open Welcome (a visitor's
+/// first screen); any other address under it is resolved by [_Start.of] as usual.
+String demoPathFor(String pagePath) {
+  const prefix = '/Daaymn/demo';
+  if (pagePath != prefix && !pagePath.startsWith('$prefix/')) return pagePath;
+  final rest = pagePath.substring(prefix.length);
+  return rest.isEmpty || rest == '/' ? '/welcome' : rest;
+}
+
+const playListing =
+    'https://play.google.com/store/apps/details?id=com.daaymn.daaymn';
 
 /// Completes once the first screens' photos are in memory (or after 4 s, so a dead
 /// network can't hold the cards back). Discover builds its cards only after this, so
@@ -588,6 +602,21 @@ class DemoWelcome extends StatelessWidget {
                 child: const Text(
                   'Start browsing',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                style: TextButton.styleFrom(foregroundColor: Colors.white),
+                onPressed: () => launchUrl(
+                  Uri.parse(playListing),
+                  webOnlyWindowName: '_blank',
+                ),
+                child: const Text(
+                  'Get Daaymn on Google Play',
+                  style: TextStyle(
+                    fontSize: 14,
+                    decoration: TextDecoration.underline,
+                  ),
                 ),
               ),
             ],
